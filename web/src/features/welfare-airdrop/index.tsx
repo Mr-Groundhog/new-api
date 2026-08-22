@@ -19,7 +19,7 @@ import {
   Sparkles,
   TicketCheck,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -59,102 +59,6 @@ function AirdropOrb() {
   )
 }
 
-const CONFETTI_COLORS = [
-  '#22d3ee',
-  '#a78bfa',
-  '#f0abfc',
-  '#34d399',
-  '#fbbf24',
-  '#f472b6',
-  '#60a5fa',
-]
-
-function AirdropConverge() {
-  const streaks = useMemo(
-    () =>
-      Array.from({ length: 30 }, (_, i) => {
-        const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.45
-        const distance = 280 + Math.random() * 280
-        return {
-          sx: Math.round(Math.cos(angle) * distance),
-          sy: Math.round(Math.sin(angle) * distance),
-          rot: Math.round((angle * 180) / Math.PI),
-          delay: (Math.random() * 0.35).toFixed(3),
-          duration: (0.65 + Math.random() * 0.5).toFixed(3),
-          width: 12 + Math.round(Math.random() * 14),
-          color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-        }
-      }),
-    [],
-  )
-  return (
-    <div className="airdrop-converge" aria-hidden="true">
-      {streaks.map((streak, index) => (
-        <span
-          key={index}
-          style={
-            {
-              '--sx': `${streak.sx}px`,
-              '--sy': `${streak.sy}px`,
-              '--rot': `${streak.rot}deg`,
-              '--delay': `${streak.delay}s`,
-              '--dur': `${streak.duration}s`,
-              '--c': streak.color,
-              width: `${streak.width}px`,
-            } as CSSProperties
-          }
-        />
-      ))}
-    </div>
-  )
-}
-
-function AirdropConfetti() {
-  const pieces = useMemo(
-    () =>
-      Array.from({ length: 34 }, (_, i) => {
-        const angle = (i / 34) * Math.PI * 2 + (Math.random() - 0.5) * 0.5
-        const distance = 110 + Math.random() * 240
-        return {
-          tx: Math.round(Math.cos(angle) * distance),
-          ty: Math.round(Math.sin(angle) * distance - 40),
-          fall: Math.round(240 + Math.random() * 300),
-          rot: Math.round((Math.random() - 0.5) * 900),
-          delay: (Math.random() * 0.25).toFixed(3),
-          duration: (2.4 + Math.random() * 1.3).toFixed(3),
-          color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-          width: 5 + Math.round(Math.random() * 7),
-          height: 8 + Math.round(Math.random() * 9),
-          round: Math.random() > 0.62,
-        }
-      }),
-    [],
-  )
-  return (
-    <div className="airdrop-confetti" aria-hidden="true">
-      {pieces.map((piece, index) => (
-        <span
-          key={index}
-          style={
-            {
-              '--tx': `${piece.tx}px`,
-              '--ty': `${piece.ty}px`,
-              '--fall': `${piece.fall}px`,
-              '--rot': `${piece.rot}deg`,
-              '--delay': `${piece.delay}s`,
-              '--dur': `${piece.duration}s`,
-              '--c': piece.color,
-              width: `${piece.width}px`,
-              height: `${piece.height}px`,
-              borderRadius: piece.round ? '999px' : '2px',
-            } as CSSProperties
-          }
-        />
-      ))}
-    </div>
-  )
-}
-
 const stateBadgeClass: Record<WelfareAirdrop['state'], string> = {
   upcoming: 'border-violet-400/40 bg-violet-400/10 text-violet-400',
   active: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-500',
@@ -174,12 +78,10 @@ const stateLabels = {
 function CampaignCard({
   campaign,
   pending,
-  celebrating,
   onClaim,
 }: {
   campaign: WelfareAirdrop
   pending: boolean
-  celebrating: boolean
   onClaim: () => void
 }) {
   const { t } = useTranslation()
@@ -191,15 +93,13 @@ function CampaignCard({
       )
   const status = t(stateLabels[campaign.state])
   let claimLabel = status
-  if (celebrating) {
-    claimLabel = t('Claimed')
-  } else if (pending) {
+  if (pending) {
     claimLabel = t('Claiming...')
   } else if (campaign.canClaim) {
     claimLabel = t('Claim credit')
   }
   return (
-    <article className={`airdrop-glow airdrop-enter h-full flex flex-col overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 via-background to-violet-500/10 transition-transform duration-300 hover:-translate-y-1 ${celebrating ? 'airdrop-card-celebrating' : ''}`}>
+    <article className="airdrop-glow airdrop-enter h-full flex flex-col overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 via-background to-violet-500/10 transition-transform duration-300 hover:-translate-y-1">
       <div className="flex items-start justify-between gap-4 p-5 pb-0">
         <div className="flex gap-3">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.15)]">
@@ -266,16 +166,11 @@ function CampaignCard({
           </div>
         )}
         <Button
-          className={`h-11 w-full rounded-full border-0 bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-[0_8px_24px_-8px_rgba(34,211,238,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-8px_rgba(139,92,246,0.55)] hover:from-cyan-400 hover:to-violet-400 disabled:opacity-50 ${pending ? 'airdrop-claim-charging' : ''} ${celebrating ? 'airdrop-claim-success' : ''}`}
-          disabled={!campaign.canClaim || pending || celebrating}
+          className={`h-11 w-full rounded-full border-0 bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-[0_8px_24px_-8px_rgba(34,211,238,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-8px_rgba(139,92,246,0.55)] hover:from-cyan-400 hover:to-violet-400 disabled:opacity-50 ${pending ? 'airdrop-claim-charging' : ''}`}
+          disabled={!campaign.canClaim || pending}
           onClick={onClaim}
         >
-          {celebrating ? (
-            <>
-              <Check className="airdrop-claim-success-icon" aria-hidden="true" />
-              <span className="airdrop-claim-burst" aria-hidden="true"><i /><i /><i /><i /></span>
-            </>
-          ) : pending ? (
+          {pending ? (
             <LoaderCircle className="animate-spin" aria-hidden="true" />
           ) : (
             <Sparkles aria-hidden="true" />
@@ -328,22 +223,6 @@ export function WelfareAirdrop() {
   const { t } = useTranslation()
   const client = useQueryClient()
   const [claimingId, setClaimingId] = useState<number | null>(null)
-  const [celebratingId, setCelebratingId] = useState<number | null>(null)
-  const [celebrationQuota, setCelebrationQuota] = useState<number | null>(null)
-  useEffect(() => {
-    if (celebratingId === null) return
-    const timeout = window.setTimeout(() => {
-      void client
-        .invalidateQueries({
-          queryKey: welfareAirdropQueryKeys.campaigns,
-        })
-        .finally(() => {
-          setCelebratingId(null)
-          setCelebrationQuota(null)
-        })
-    }, 4600)
-    return () => window.clearTimeout(timeout)
-  }, [celebratingId, client])
   const query = useQuery({
     queryKey: welfareAirdropQueryKeys.campaigns,
     queryFn: getWelfareAirdrops,
@@ -357,9 +236,15 @@ export function WelfareAirdrop() {
   const mutation = useMutation({
     mutationFn: claimWelfareAirdrop,
     onMutate: (id) => setClaimingId(id),
-    onSuccess: (claim, id) => {
-      setCelebratingId(id)
-      setCelebrationQuota(claim.quota)
+    onSuccess: (claim) => {
+      toast.success(
+        t('Successfully received {{quota}} credit, added to your wallet', {
+          quota: formatQuota(claim.quota),
+        })
+      )
+      void client.invalidateQueries({
+        queryKey: welfareAirdropQueryKeys.campaigns,
+      })
       void client.invalidateQueries({
         queryKey: welfareAirdropQueryKeys.claims,
       })
@@ -395,39 +280,6 @@ export function WelfareAirdrop() {
         </Button>
       </SectionPageLayout.Actions>
       <SectionPageLayout.Content>
-        {celebratingId !== null && celebrationQuota !== null && (
-          <>
-            <AirdropConverge />
-            <AirdropConfetti />
-            <div
-              className="airdrop-success-overlay"
-              role="status"
-              aria-live="polite"
-            >
-              <span className="airdrop-success-halo" aria-hidden="true" />
-              <span className="airdrop-success-shockwave" aria-hidden="true" />
-              <div className="airdrop-success-rays" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-              <div className="airdrop-success-badge" aria-hidden="true">
-                <Check />
-              </div>
-              <div className="airdrop-success-copy">
-                <strong>
-                  {t(
-                    'Successfully received {{quota}} credit, added to your wallet',
-                    { quota: formatQuota(celebrationQuota) },
-                  )}
-                </strong>
-              </div>
-            </div>
-          </>
-        )}
         <div className="mx-auto w-full max-w-5xl space-y-6 py-2">
           {query.isLoading ? (
             <div className="text-cyan-500 flex justify-center py-16">
@@ -453,7 +305,6 @@ export function WelfareAirdrop() {
                     <CampaignCard
                       campaign={campaign}
                       pending={claimingId === campaign.id}
-                      celebrating={celebratingId === campaign.id}
                       onClaim={() => mutation.mutate(campaign.id)}
                     />
                   </CarouselItem>

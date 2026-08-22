@@ -484,6 +484,26 @@ func findOrCreateOAuthUser(c *gin.Context, provider oauth.Provider, oauthUser *o
 	user.Role = common.RoleCommonUser
 	user.Status = common.UserStatusEnabled
 
+	// 记录注册来源，用于追踪用户最初通过哪种渠道注册。
+	if _, ok := provider.(*oauth.GenericOAuthProvider); ok {
+		user.RegistrationSource = model.RegistrationSourceCustomOAuth
+	} else {
+		switch provider.ProviderUserIDColumn() {
+		case "github_id":
+			user.RegistrationSource = model.RegistrationSourceGitHub
+		case "discord_id":
+			user.RegistrationSource = model.RegistrationSourceDiscord
+		case "oidc_id":
+			user.RegistrationSource = model.RegistrationSourceOIDC
+		case "linux_do_id":
+			user.RegistrationSource = model.RegistrationSourceLinuxDO
+		case "wechat_id":
+			user.RegistrationSource = model.RegistrationSourceWeChat
+		case "telegram_id":
+			user.RegistrationSource = model.RegistrationSourceTelegram
+		}
+	}
+
 	// Handle affiliate code
 	inviterId := 0
 	if affiliateCode != "" {

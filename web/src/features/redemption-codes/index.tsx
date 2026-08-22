@@ -23,8 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { AdminCampaigns } from '@/features/welfare-airdrop/admin-campaigns'
 
-import { RegistrationCodes } from '@/features/registration-codes'
-
 import { RedemptionsDialogs } from './components/redemptions-dialogs'
 import { RedemptionsPrimaryButtons } from './components/redemptions-primary-buttons'
 import { RedemptionsProvider } from './components/redemptions-provider'
@@ -51,19 +49,13 @@ export function Redemptions() {
                 <TabsTrigger value="campaigns">
                   {t('Airdrop campaigns')}
                 </TabsTrigger>
-                <TabsTrigger value="registration">
-                  {t('Registration Codes')}
-                </TabsTrigger>
               </TabsList>
             </div>
             <TabsContent value="codes" className="min-h-0 flex-1">
               <RedemptionsTable />
             </TabsContent>
-            <TabsContent value="campaigns" className="min-h-0 flex-1">
+            <TabsContent value="campaigns" className="min-h-0 flex-1 overflow-auto">
               <AdminCampaigns />
-            </TabsContent>
-            <TabsContent value="registration" className="min-h-0 flex-1">
-              <RegistrationCodes />
             </TabsContent>
           </Tabs>
         </SectionPageLayout.Content>

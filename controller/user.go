@@ -281,6 +281,7 @@ func Register(c *gin.Context) {
 	if common.EmailVerificationEnabled {
 		cleanUser.Email = user.Email
 	}
+	cleanUser.RegistrationSource = model.RegistrationSourcePassword
 	if err := cleanUser.Insert(inviterId); err != nil {
 		if errors.Is(err, model.ErrEmailAlreadyTaken) {
 			common.ApiErrorI18n(c, i18n.MsgUserEmailAlreadyTaken)
@@ -994,6 +995,7 @@ func CreateUser(c *gin.Context) {
 		Role:        user.Role, // 保持管理员设置的角色
 	}
 	authzTouched := false
+	cleanUser.RegistrationSource = model.RegistrationSourcePassword
 	if err := model.DB.Transaction(func(tx *gorm.DB) error {
 		if err := cleanUser.InsertWithTx(tx, 0); err != nil {
 			return err
@@ -1251,7 +1253,7 @@ func TopUp(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
-	quota, err := model.Redeem(req.Key, id)
+	quota, _, err := model.Redeem(req.Key, id)
 	if err != nil {
 		// 不向用户暴露兑换失败的细分原因，避免攻击者根据错误类型判断兑换码状态。
 		common.ApiErrorI18n(c, i18n.MsgRedeemFailed)

@@ -19,6 +19,28 @@ import (
 
 const UserNameMaxLength = 20
 
+const (
+	RegistrationSourceUnknown     = 0
+	RegistrationSourcePassword    = 1
+	RegistrationSourceGitHub      = 2
+	RegistrationSourceDiscord     = 3
+	RegistrationSourceOIDC        = 4
+	RegistrationSourceLinuxDO     = 5
+	RegistrationSourceWeChat      = 6
+	RegistrationSourceTelegram    = 7
+	RegistrationSourceCustomOAuth = 8
+)
+
+const (
+	UserBanReasonBatchActivityCheck       = "batch_activity_check"
+	UserBanReasonBatchInviteSubaccounts   = "batch_invite_subaccounts"
+	UserBanReasonInactive15DaysNoAPICalls = "inactive_15_days_no_api_calls"
+	UserBanReasonProhibitedWords          = "prohibited_words"
+	UserBanReasonJailbreak                = "jailbreak_or_prohibited_content"
+	// UserBanReasonBatchModelProbing 与 UserBanReasonBatchActivityCheck 含义一致，
+	// 仅为兼容合并进来的上游 probe-guard 逻辑而保留的独立代码。
+	UserBanReasonBatchModelProbing = "batch_model_probing"
+)
 var userSortColumns = map[string]string{
 	"id":            "id",
 	"username":      "username",
@@ -85,6 +107,10 @@ type User struct {
 	DisplayName          string                     `json:"display_name" gorm:"index" validate:"max=20"`
 	Role                 int                        `json:"role" gorm:"type:int;default:1"`   // admin, common
 	Status               int                        `json:"status" gorm:"type:int;default:1"` // enabled, disabled
+	// SensitiveWordTriggerCount stores the cumulative number of blocked sensitive-word requests for risk review.
+	SensitiveWordTriggerCount int `json:"sensitive_word_trigger_count" gorm:"type:int;not null;default:0"`
+	// BanReason stores a predefined reason code or administrator-provided explanation for a disabled user.
+	BanReason        string         `json:"ban_reason,omitempty" gorm:"type:varchar(255)"`
 	Email                string                     `json:"email" gorm:"index" validate:"max=50"`
 	GitHubId             string                     `json:"github_id" gorm:"column:github_id;index"`
 	DiscordId            string                     `json:"discord_id" gorm:"column:discord_id;index"`
@@ -105,11 +131,14 @@ type User struct {
 	InviterId            int                        `json:"inviter_id" gorm:"type:int;column:inviter_id;index"`
 	DeletedAt            gorm.DeletedAt             `gorm:"index"`
 	LinuxDOId            string                     `json:"linux_do_id" gorm:"column:linux_do_id;index"`
+	// RegistrationSource records the account creation method using the RegistrationSource constants.
+	RegistrationSource int                        `json:"registration_source" gorm:"type:int;column:registration_source;index"`
 	Setting              string                     `json:"setting" gorm:"type:text;column:setting"`
 	Remark               string                     `json:"remark,omitempty" gorm:"type:varchar(255)" validate:"max=255"`
 	StripeCustomer       string                     `json:"stripe_customer" gorm:"type:varchar(64);column:stripe_customer;index"`
 	CreatedAt            int64                      `json:"created_at" gorm:"autoCreateTime;column:created_at"`
 	LastLoginAt          int64                      `json:"last_login_at" gorm:"default:0;column:last_login_at"`
+	LastLoginIp          string                     `json:"last_login_ip" gorm:"type:varchar(64);default:'';column:last_login_ip"` // 最近一次成功登录系统时使用的 IP 地址；仅保留最近一次，完整登录 IP 历史见登录审计日志
 	AuthVersion          int64                      `json:"-" gorm:"type:bigint;not null;default:1;column:auth_version"`
 	AdminPermissions     map[string]map[string]bool `json:"admin_permissions,omitempty" gorm:"-:all"`
 }
@@ -248,12 +277,13 @@ func generateDefaultSidebarConfigForRole(userRole int) string {
 
 	// 控制台区域 - 所有用户都可以访问
 	defaultConfig["console"] = map[string]interface{}{
-		"enabled":    true,
-		"detail":     true,
-		"token":      true,
-		"log":        true,
-		"midjourney": true,
-		"task":       true,
+		"enabled":        true,
+		"detail":         true,
+		"token":          true,
+		"log":            true,
+		"midjourney":     true,
+		"task":           true,
+		"welfareAirdrop": true,
 	}
 
 	// 个人中心区域 - 所有用户都可以访问
@@ -690,6 +720,7 @@ func (user *User) Insert(inviterId int) error {
 			}
 			user.Quota = common.QuotaForNewUser
 			user.AffCode = common.GetRandomString(4)
+			user.InviterId = inviterId
 
 			// 初始化用户设置，包括默认的边栏配置
 			if user.Setting == "" {
@@ -754,6 +785,7 @@ func (user *User) InsertWithTx(tx *gorm.DB, inviterId int) error {
 		}
 		user.Quota = common.QuotaForNewUser
 		user.AffCode = common.GetRandomString(4)
+		user.InviterId = inviterId
 
 		// 初始化用户设置
 		if user.Setting == "" {
@@ -765,9 +797,47 @@ func (user *User) InsertWithTx(tx *gorm.DB, inviterId int) error {
 	})
 }
 
+// InitializeUserRegistrationSources backfills the best available source for users created before source tracking.
+func InitializeUserRegistrationSources() error {
+	if err := DB.Model(&User{}).
+		Where("registration_source = ? AND password <> ?", RegistrationSourceUnknown, "").
+		Update("registration_source", RegistrationSourcePassword).Error; err != nil {
+		return err
+	}
+
+	providerSources := []struct {
+		column string
+		source int
+	}{
+		{column: "github_id", source: RegistrationSourceGitHub},
+		{column: "discord_id", source: RegistrationSourceDiscord},
+		{column: "oidc_id", source: RegistrationSourceOIDC},
+		{column: "linux_do_id", source: RegistrationSourceLinuxDO},
+		{column: "wechat_id", source: RegistrationSourceWeChat},
+		{column: "telegram_id", source: RegistrationSourceTelegram},
+	}
+	for _, providerSource := range providerSources {
+		if err := DB.Model(&User{}).
+			Where("registration_source = ? AND "+providerSource.column+" <> ?", RegistrationSourceUnknown, "").
+			Update("registration_source", providerSource.source).Error; err != nil {
+			return err
+		}
+	}
+
+	return DB.Model(&User{}).
+		Where("registration_source = ? AND id IN (?)", RegistrationSourceUnknown, DB.Model(&UserOAuthBinding{}).Select("user_id")).
+		Update("registration_source", RegistrationSourceCustomOAuth).Error
+}
+
 // FinalizeOAuthUserCreation performs post-transaction tasks for OAuth user creation.
 // This should be called after the transaction commits successfully.
 func (user *User) FinalizeOAuthUserCreation(inviterId int) {
+	if inviterId != 0 && user.InviterId == 0 {
+		user.InviterId = inviterId
+		if err := DB.Model(&User{}).Where("id = ?", user.Id).Update("inviter_id", inviterId).Error; err != nil {
+			common.SysError(fmt.Sprintf("failed to persist OAuth inviter for user %d: %v", user.Id, err))
+		}
+	}
 	// 用户创建成功后，根据角色初始化边栏配置
 	var createdUser User
 	if err := DB.Where("id = ?", user.Id).First(&createdUser).Error; err == nil {
@@ -850,6 +920,8 @@ func (user *User) UpdateWithTx(tx *gorm.DB, updatePassword bool) error {
 		"aff_count",
 		"aff_quota",
 		"aff_history",
+		"inviter_id",
+		"registration_source",
 		"auth_version",
 	).Updates(newUser).Error; err != nil {
 		return err

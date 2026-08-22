@@ -1,17 +1,1 @@
-{
-  "base": "en.json",
-  "locales": {
-    "en": {
-      "file": "en.json",
-      "missingCount": 0,
-      "extrasCount": 0,
-      "untranslatedCount": 0
-    },
-    "zh": {
-      "file": "zh.json",
-      "missingCount": 0,
-      "extrasCount": 0,
-      "untranslatedCount": 2
-    }
-  }
-}
+<<<<<<< C:\Users\Ferry\AppData\Local\Temp\tmp7F9A.tmp {   "base": "en.json",   "locales": {     "en": {       "file": "en.json",       "missingCount": 0,       "extrasCount": 0,       "untranslatedCount": 0     },     "zh": {       "file": "zh.json",       "missingCount": 0,       "extrasCount": 0,       "untranslatedCount": 2     }   } } ======= {   "base": "en.json",   "locales": {     "en": {       "file": "en.json",       "missingCount": 0,       "extrasCount": 0,       "untranslatedCount": 0     },     "zh": {       "file": "zh.json",       "missingCount": 0,       "extrasCount": 0,       "untranslatedCount": 1     }   } } >>>>>>> C:\Users\Ferry\AppData\Local\Temp\tmp7F9B.tmp
