@@ -19,6 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 import axios from 'axios'
 
 import { api, refreshAuthentication, type RefreshOutcome } from '@/lib/api'
+import { AuthOperationError } from '@/lib/secure-verification'
+import { getServerErrorMessageKey } from '@/lib/server-error-message'
 import { useAuthStore } from '@/stores/auth-store'
 
 import {
@@ -27,13 +29,13 @@ import {
 } from './lib/password-encryption'
 import { getAffiliateCode } from './lib/storage'
 import type { TelegramAuthorization } from './lib/telegram-login'
+import type { VerificationOperation } from './secure-verification/types'
 import type {
   LoginPayload,
   LoginResponse,
   Login2FAResponse,
   TwoFAPayload,
   RegisterPayload,
-  RegistrationCodeCheckResult,
   ApiResponse,
 } from './types'
 
@@ -165,11 +167,13 @@ export async function githubOAuthStart(clientId: string, state: string) {
 }
 
 // Get OAuth state for CSRF protection
-export async function createOAuthFlow(
+export async function createOAuthAuthorization(
   provider: string,
-  intent: 'login' | 'bind',
-  registrationCode?: string
-): Promise<string> {
+  intent: 'login' | 'bind' | 'verify',
+  operation?: VerificationOperation,
+  signal?: AbortSignal,
+  proofToken?: string
+): Promise<{ state: string; authorizationUrl?: string }> {
   const aff = intent === 'login' ? getAffiliateCode() : ''
   const res = await api.post(
     '/api/oauth/state',
@@ -177,17 +181,43 @@ export async function createOAuthFlow(
       provider,
       intent,
       aff: aff || undefined,
-      registration_code: registrationCode || undefined,
+      scope: operation?.scope,
+      ...(operation?.context ? { context: operation.context } : {}),
     },
-    { skipAuthRefresh: intent === 'login' }
+    {
+      skipAuthRefresh: intent === 'login',
+      ...(proofToken ? { headers: { 'X-Security-Proof': proofToken } } : {}),
+      singleUseAuthorization: intent === 'bind',
+      signal,
+      skipBusinessError: true,
+      skipErrorHandler: true,
+    }
   )
   if (res.data?.success) {
-    if (typeof res.data.data === 'string') return res.data.data
+    if (typeof res.data.data === 'string') return { state: res.data.data }
     if (typeof res.data.data?.flow_token === 'string') {
-      return res.data.data.flow_token
+      return {
+        state: res.data.data.flow_token,
+        authorizationUrl: res.data.data.authorization_url,
+      }
     }
   }
-  throw new Error(res.data?.message || 'Failed to initialize OAuth')
+  throw new AuthOperationError(
+    getServerErrorMessageKey(res.data) ||
+      res.data?.message ||
+      'Failed to initialize OAuth',
+    res.data?.code
+  )
+}
+
+export async function createOAuthFlow(
+  provider: string,
+  intent: 'login' | 'bind' | 'verify',
+  operation?: VerificationOperation,
+  signal?: AbortSignal
+): Promise<string> {
+  return (await createOAuthAuthorization(provider, intent, operation, signal))
+    .state
 }
 
 // WeChat login by authorization code
@@ -221,17 +251,6 @@ export async function register(payload: RegisterPayload): Promise<ApiResponse> {
   return res.data
 }
 
-// Pre-check registration code validity without consuming it
-export async function checkRegistrationCode(
-  code: string
-): Promise<ApiResponse<RegistrationCodeCheckResult>> {
-  const res = await api.get('/api/user/registration-code/check', {
-    params: { code },
-    skipBusinessError: true,
-  })
-  return res.data
-}
-
 // Send email verification code
 export async function sendEmailVerification(
   email: string,
@@ -243,14 +262,21 @@ export async function sendEmailVerification(
   return res.data
 }
 
-// Bind email to OAuth account
+// Confirm an authenticated, server-owned email binding flow.
 export async function bindEmail(
-  email: string,
-  code: string
+  flowToken: string,
+  newCode: string,
+  oldCode = '',
+  signal?: AbortSignal
 ): Promise<ApiResponse> {
-  const res = await api.post('/api/oauth/email/bind', {
-    email,
-    code,
-  })
+  const res = await api.post(
+    '/api/oauth/email/bind',
+    {
+      flow_token: flowToken,
+      new_code: newCode,
+      old_code: oldCode,
+    },
+    { singleUseAuthorization: true, signal }
+  )
   return res.data
 }

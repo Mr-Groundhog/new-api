@@ -42,6 +42,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useMediaQuery } from '@/hooks'
 import { cn } from '@/lib/utils'
 
 import { getApiKey, updateApiKey } from '../api'
@@ -69,10 +70,11 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
   const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
-  const group = props.apiKey.group || ''
+  const isMobile = useMediaQuery('(max-width: 640px)')
+  const group = (props.apiKey.group || '').trim()
   const isAuto = group === 'auto'
   const canSwitch = props.groupOptions.length > 0
-  const ratio = typeof props.ratio === 'number' ? props.ratio : undefined
+  const ratio = group && typeof props.ratio === 'number' ? props.ratio : undefined
 
   const filteredOptions = useMemo(() => {
     const search = searchValue.trim().toLowerCase()
@@ -134,11 +136,18 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
     if (!isAuto) {
       return (
         <TruncatedCell
-          className='-ml-1.5'
-          tooltipContent={group || '-'}
+          className={cn('-ml-1.5', isMobile ? 'w-full' : 'max-w-50')}
+          tabIndex={0}
+          tooltipContent={group || t('Follow user group')}
           tooltipClassName='break-all'
         >
-          <GroupBadge group={group} ratio={ratio} />
+          <GroupBadge
+            group={group}
+            ratio={ratio}
+            ratioLabel={group ? undefined : t('Inherited')}
+            className='px-0'
+            containerClassName={cn('gap-3', isMobile && 'w-full justify-between')}
+          />
         </TruncatedCell>
       )
     }
@@ -149,7 +158,11 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
           render={
             <BadgeCell
               data-api-key-group-cell='auto'
-              className='gap-1.5 overflow-visible text-xs'
+              tabIndex={0}
+              className={cn(
+                'ml-0 gap-1.5 overflow-visible text-xs',
+                isMobile ? 'w-full justify-between' : 'max-w-50'
+              )}
             />
           }
         >
@@ -157,6 +170,7 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
             label={t('Cross-group')}
             variant='info'
             copyable={false}
+            className='px-0'
           />
           <GroupRatioBadge
             ratio={props.ratio}
