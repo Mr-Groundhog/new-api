@@ -26,6 +26,7 @@ export type HeaderNavModulesConfig = {
   console: boolean
   pricing: HeaderNavAccessConfig
   rankings: HeaderNavAccessConfig
+  lottery: HeaderNavAccessConfig
   docs: boolean
   about: boolean
   [key: string]: boolean | HeaderNavAccessConfig
@@ -49,6 +50,10 @@ export const HEADER_NAV_DEFAULT: HeaderNavModulesConfig = {
     enabled: true,
     requireAuth: false,
   },
+  lottery: {
+    enabled: true,
+    requireAuth: true,
+  },
   docs: true,
   about: true,
 }
@@ -64,7 +69,6 @@ export const SIDEBAR_MODULES_DEFAULT: SidebarModulesAdminConfig = {
     detail: true,
     token: true,
     log: true,
-    audit: true,
     midjourney: true,
     task: true,
   },
@@ -72,15 +76,18 @@ export const SIDEBAR_MODULES_DEFAULT: SidebarModulesAdminConfig = {
     enabled: true,
     topup: true,
     personal: true,
-    security: true,
     welfareAirdrop: true,
+    ticket: true,
   },
   admin: {
     enabled: true,
     channel: true,
     models: true,
     redemption: true,
+    ticket: true,
     user: true,
+    sensitiveWordTriggers: true,
+    userRankings: true,
     setting: true,
     subscription: true,
   },
@@ -101,6 +108,7 @@ const cloneHeaderNavDefault = (): HeaderNavModulesConfig => ({
   ...HEADER_NAV_DEFAULT,
   pricing: { ...HEADER_NAV_DEFAULT.pricing },
   rankings: { ...HEADER_NAV_DEFAULT.rankings },
+  lottery: { ...HEADER_NAV_DEFAULT.lottery },
 })
 
 const parseAccessModule = (
@@ -149,6 +157,7 @@ export function parseHeaderNavModules(
       ...base,
       pricing: { ...base.pricing },
       rankings: { ...base.rankings },
+      lottery: { ...base.lottery },
     }
 
     Object.entries(parsed).forEach(([key, raw]) => {
@@ -158,6 +167,10 @@ export function parseHeaderNavModules(
       }
       if (key === 'rankings') {
         result.rankings = parseAccessModule(raw, base.rankings)
+        return
+      }
+      if (key === 'lottery') {
+        result.lottery = parseAccessModule(raw, base.lottery)
         return
       }
 

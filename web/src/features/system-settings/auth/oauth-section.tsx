@@ -81,7 +81,8 @@ const oauthSchema = z.object({
     user_info_endpoint: z.string(),
   }),
   TelegramOAuthEnabled: z.boolean(),
-  telegram: z.object({ client_id: z.string(), client_secret: z.string() }),
+  TelegramBotToken: z.string(),
+  TelegramBotName: z.string(),
   LinuxDOOAuthEnabled: z.boolean(),
   LinuxDOClientId: z.string(),
   LinuxDOClientSecret: z.string(),
@@ -110,8 +111,8 @@ type FlatOAuthDefaults = {
   'oidc.token_endpoint': string
   'oidc.user_info_endpoint': string
   TelegramOAuthEnabled: boolean
-  'telegram.client_id': string
-  'telegram.client_secret': string
+  TelegramBotToken: string
+  TelegramBotName: string
   LinuxDOOAuthEnabled: boolean
   LinuxDOClientId: string
   LinuxDOClientSecret: string
@@ -194,10 +195,8 @@ const buildFormDefaults = (defaults: FlatOAuthDefaults): OAuthFormValues => ({
     user_info_endpoint: defaults['oidc.user_info_endpoint'] ?? '',
   },
   TelegramOAuthEnabled: defaults.TelegramOAuthEnabled,
-  telegram: {
-    client_id: defaults['telegram.client_id'] ?? '',
-    client_secret: defaults['telegram.client_secret'] ?? '',
-  },
+  TelegramBotToken: defaults.TelegramBotToken ?? '',
+  TelegramBotName: defaults.TelegramBotName ?? '',
   LinuxDOOAuthEnabled: defaults.LinuxDOOAuthEnabled,
   LinuxDOClientId: defaults.LinuxDOClientId ?? '',
   LinuxDOClientSecret: defaults.LinuxDOClientSecret ?? '',
@@ -223,9 +222,9 @@ const normalizeFormValues = (values: OAuthFormValues): FlatOAuthDefaults => ({
   'oidc.authorization_endpoint': values.oidc.authorization_endpoint,
   'oidc.token_endpoint': values.oidc.token_endpoint,
   'oidc.user_info_endpoint': values.oidc.user_info_endpoint,
-  'telegram.client_id': values.telegram.client_id,
-  'telegram.client_secret': values.telegram.client_secret,
   TelegramOAuthEnabled: values.TelegramOAuthEnabled,
+  TelegramBotToken: values.TelegramBotToken,
+  TelegramBotName: values.TelegramBotName,
   LinuxDOOAuthEnabled: values.LinuxDOOAuthEnabled,
   LinuxDOClientId: values.LinuxDOClientId,
   LinuxDOClientSecret: values.LinuxDOClientSecret,
@@ -259,11 +258,6 @@ export function OAuthSection(props: OAuthSectionProps) {
   const oidcCallbackUrl = buildOAuthCallbackUrl(
     props.serverAddress,
     'oidc',
-    t('Site URL')
-  )
-  const telegramCallbackUrl = buildOAuthCallbackUrl(
-    props.serverAddress,
-    'telegram',
     t('Site URL')
   )
   const linuxDOCallbackUrl = buildOAuthCallbackUrl(
@@ -813,19 +807,6 @@ export function OAuthSection(props: OAuthSectionProps) {
                 value='telegram'
                 className={oauthTabContentClassName}
               >
-                <OAuthSetupGuide
-                  title={t('Setup guide')}
-                  description={t(
-                    'In BotFather, open Login Widget, register this callback URL, and copy the Client ID and Client Secret. Existing Telegram bindings will continue to work after configuration.'
-                  )}
-                  rows={[
-                    {
-                      label: t('Authorization callback URL'),
-                      value: telegramCallbackUrl,
-                      copyLabel: t('Copy callback URL'),
-                    },
-                  ]}
-                />
                 <FormField
                   control={form.control}
                   name='TelegramOAuthEnabled'
@@ -849,16 +830,14 @@ export function OAuthSection(props: OAuthSectionProps) {
 
                 <FormField
                   control={form.control}
-                  name='telegram.client_secret'
+                  name='TelegramBotToken'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Client Secret')}</FormLabel>
+                      <FormLabel>{t('Bot Token')}</FormLabel>
                       <FormControl>
                         <Input
                           type='password'
-                          placeholder={t(
-                            'Telegram OAuth Client Secret from BotFather'
-                          )}
+                          placeholder={t('Your Telegram Bot Token')}
                           autoComplete='new-password'
                           value={field.value ?? ''}
                           onChange={(event) =>
@@ -876,15 +855,13 @@ export function OAuthSection(props: OAuthSectionProps) {
 
                 <FormField
                   control={form.control}
-                  name='telegram.client_id'
+                  name='TelegramBotName'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Client ID')}</FormLabel>
+                      <FormLabel>{t('Bot Name')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={t(
-                            'Telegram OAuth Client ID from BotFather'
-                          )}
+                          placeholder={t('Your Bot Name')}
                           autoComplete='off'
                           value={field.value ?? ''}
                           onChange={(event) =>

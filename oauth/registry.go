@@ -12,8 +12,7 @@ var (
 	providers = make(map[string]Provider)
 	mu        sync.RWMutex
 	// customProviderSlugs tracks which providers are custom (can be unregistered)
-	customProviderSlugs     = make(map[string]bool)
-	customProviderConflicts = make(map[string]bool)
+	customProviderSlugs = make(map[string]bool)
 )
 
 // Register registers an OAuth provider with the given name
@@ -24,22 +23,11 @@ func Register(name string, provider Provider) {
 }
 
 // RegisterCustom registers a custom OAuth provider (can be unregistered later)
-func RegisterCustom(name string, provider Provider) error {
+func RegisterCustom(name string, provider Provider) {
 	mu.Lock()
 	defer mu.Unlock()
-	if providers[name] != nil && !customProviderSlugs[name] {
-		customProviderConflicts[name] = true
-		return fmt.Errorf("custom OAuth provider %q conflicts with a built-in provider; rename the custom provider", name)
-	}
 	providers[name] = provider
 	customProviderSlugs[name] = true
-	return nil
-}
-
-func HasCustomProviderConflict(name string) bool {
-	mu.RLock()
-	defer mu.RUnlock()
-	return customProviderConflicts[name]
 }
 
 // Unregister removes a provider from the registry
@@ -106,7 +94,6 @@ func LoadCustomProviders() error {
 		delete(providers, name)
 	}
 	customProviderSlugs = make(map[string]bool)
-	customProviderConflicts = make(map[string]bool)
 	mu.Unlock()
 
 	// Load all custom providers from database
@@ -117,19 +104,14 @@ func LoadCustomProviders() error {
 	}
 
 	// Register each custom provider
-	var conflict error
 	for _, config := range customProviders {
 		provider := NewGenericOAuthProvider(config)
-		if err := RegisterCustom(config.Slug, provider); err != nil {
-			common.SysError(err.Error())
-			conflict = err
-			continue
-		}
+		RegisterCustom(config.Slug, provider)
 		common.SysLog("Loaded custom OAuth provider: " + config.Name + " (" + config.Slug + ")")
 	}
 
 	common.SysLog(fmt.Sprintf("Loaded %d custom OAuth providers", len(customProviders)))
-	return conflict
+	return nil
 }
 
 // ReloadCustomProviders reloads all custom OAuth providers from the database
@@ -140,18 +122,13 @@ func ReloadCustomProviders() error {
 // RegisterOrUpdateCustomProvider registers or updates a single custom provider
 func RegisterOrUpdateCustomProvider(config *model.CustomOAuthProvider) {
 	provider := NewGenericOAuthProvider(config)
-	if err := RegisterCustom(config.Slug, provider); err != nil {
-		common.SysError(err.Error())
-	}
+	mu.Lock()
+	defer mu.Unlock()
+	providers[config.Slug] = provider
+	customProviderSlugs[config.Slug] = true
 }
 
 // UnregisterCustomProvider unregisters a custom provider by slug
 func UnregisterCustomProvider(slug string) {
-	mu.Lock()
-	defer mu.Unlock()
-	if customProviderSlugs[slug] {
-		delete(providers, slug)
-		delete(customProviderSlugs, slug)
-	}
-	delete(customProviderConflicts, slug)
+	Unregister(slug)
 }

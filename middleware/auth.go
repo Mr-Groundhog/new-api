@@ -45,9 +45,6 @@ func validUserInfo(username string, role int) bool {
 }
 
 func authHelper(c *gin.Context, minRole int) {
-	if _, started := c.Get(accessTokenAuditContextKey); !started {
-		defer finishAccessTokenAudit(c)
-	}
 	user, identity, useAccessToken, err := authenticateDashboardRequest(c)
 	if err != nil {
 		writeDashboardAuthError(c, err)
@@ -82,9 +79,6 @@ func authHelper(c *gin.Context, minRole int) {
 
 func TryUserAuth() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		if _, started := c.Get(accessTokenAuditContextKey); !started {
-			defer finishAccessTokenAudit(c)
-		}
 		user, identity, credentialKind, err := classifyDashboardCredential(c)
 		if err != nil {
 			writeDashboardAuthError(c, err)
@@ -178,7 +172,6 @@ func classifyDashboardCredential(c *gin.Context) (*model.UserBase, service.AuthI
 	if patUser == nil || patUser.Id <= 0 {
 		return nil, service.AuthIdentity{}, dashboardCredentialUnmatched, nil
 	}
-	beginAccessTokenAudit(c, patUser, raw)
 	user, err := model.GetUserCache(patUser.Id)
 	if err != nil {
 		return nil, service.AuthIdentity{}, dashboardCredentialPAT, err

@@ -27,12 +27,10 @@ export type ComboboxInputOption = {
   value: string
   label: string
   icon?: React.ReactNode
-  disabled?: boolean
-  description?: string
 }
 
 interface ComboboxInputProps {
-  options: readonly ComboboxInputOption[]
+  options: ComboboxInputOption[]
   value?: string
   onValueChange: (value: string) => void
   placeholder?: string
@@ -143,7 +141,6 @@ export function ComboboxInput({
         break
       case 'Escape':
         e.preventDefault()
-        e.stopPropagation()
         setOpen(false)
         setSearchValue('')
         break
@@ -232,7 +229,7 @@ export function ComboboxInput({
                       value === option.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  {option.icon && <span aria-hidden>{option.icon}</span>}
+                  {option.icon && <span>{option.icon}</span>}
                   <span className='truncate'>{option.label}</span>
                 </li>
               ))}

@@ -30,15 +30,6 @@ import type { TFunction } from 'i18next'
 export type NavBadgeTone = 'default' | 'danger' | 'attention'
 
 /**
- * Visual emphasis for a nav item badge.
- *
- * - `default`: neutral primary pill, used for counts and plain labels
- * - `attention`: warm gradient pill with a soft pulse, for time-limited
- *   promotions that should pull the eye (e.g. the welfare airdrop entry)
- */
-export type NavBadgeTone = 'default' | 'attention'
-
-/**
  * Base navigation item type
  */
 type BaseNavItem = {

@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Combobox } from '@/components/ui/combobox'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
@@ -44,7 +43,14 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetClose,
@@ -453,19 +459,32 @@ export function CreateDeploymentDrawer({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('Hardware type')}</FormLabel>
-                      <FormControl><Combobox
-options={[
+                      <Select
+                        items={[
                           ...hardwareOptions.map((opt) => ({
                             value: opt.value,
                             label: opt.label,
                           })),
                         ]}
-value={field.value}
-onValueChange={(v) => field.onChange(v)}
-disabled={isLoadingHardware}
-className='w-full'
-placeholder={t('Select')}
-/></FormControl>
+                        value={field.value}
+                        onValueChange={(v) => field.onChange(v)}
+                        disabled={isLoadingHardware}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='w-full'>
+                            <SelectValue placeholder={t('Select')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            {hardwareOptions.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

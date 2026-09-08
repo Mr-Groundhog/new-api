@@ -26,7 +26,6 @@ func SetWebRouter(router *gin.Engine, assets WebAssets, pluginDispatcher gin.Han
 		pluginDispatcher,
 		middleware.RouteTag("web"),
 		gzip.Gzip(gzip.DefaultCompression),
-		middleware.AccessTokenAudit(),
 		middleware.GlobalWebRateLimit(),
 		middleware.Cache(),
 		static.Serve("/", frontendFS),

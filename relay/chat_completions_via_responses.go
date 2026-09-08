@@ -29,11 +29,9 @@ func applySystemPromptIfNeeded(c *gin.Context, info *relaycommon.RelayInfo, requ
 
 	systemRole := request.GetSystemRoleName()
 
-	// A Kimi K3 dynamic tool loading message ({"role":"system","tools":[...]})
-	// declares tools rather than a system prompt and must never receive content.
 	containSystemPrompt := false
 	for _, message := range request.Messages {
-		if message.Role == systemRole && len(message.Tools) == 0 {
+		if message.Role == systemRole {
 			containSystemPrompt = true
 			break
 		}
@@ -53,7 +51,7 @@ func applySystemPromptIfNeeded(c *gin.Context, info *relaycommon.RelayInfo, requ
 
 	common.SetContextKey(c, constant.ContextKeySystemPromptOverride, true)
 	for i, message := range request.Messages {
-		if message.Role != systemRole || len(message.Tools) > 0 {
+		if message.Role != systemRole {
 			continue
 		}
 		if message.IsStringContent() {

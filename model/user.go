@@ -37,10 +37,9 @@ const (
 	UserBanReasonInactive15DaysNoAPICalls = "inactive_15_days_no_api_calls"
 	UserBanReasonProhibitedWords          = "prohibited_words"
 	UserBanReasonJailbreak                = "jailbreak_or_prohibited_content"
-	// UserBanReasonBatchModelProbing 与 UserBanReasonBatchActivityCheck 含义一致，
-	// 仅为兼容合并进来的上游 probe-guard 逻辑而保留的独立代码。
-	UserBanReasonBatchModelProbing = "batch_model_probing"
+	UserBanReasonBatchModelProbing        = "batch_model_probing"
 )
+
 var userSortColumns = map[string]string{
 	"id":            "id",
 	"username":      "username",
@@ -99,48 +98,50 @@ func resolveUserSortOptions(sortOptions []UserSortOptions) UserSortOptions {
 // User if you add sensitive fields, don't forget to clean them in setupLogin function.
 // Otherwise, the sensitive information will be saved on local storage in plain text!
 type User struct {
-	Id                   int                        `json:"id"`
-	Username             string                     `json:"username" gorm:"unique;index" validate:"max=20"`
-	Password             string                     `json:"password" gorm:"not null;" validate:"min=8,max=128"`
-	HasPassword          bool                       `json:"-" gorm:"-:all"`
-	OriginalPassword     string                     `json:"original_password" gorm:"-:all"` // this field is only for Password change verification, don't save it to database!
-	DisplayName          string                     `json:"display_name" gorm:"index" validate:"max=20"`
-	Role                 int                        `json:"role" gorm:"type:int;default:1"`   // admin, common
-	Status               int                        `json:"status" gorm:"type:int;default:1"` // enabled, disabled
+	Id               int    `json:"id"`
+	Username         string `json:"username" gorm:"unique;index" validate:"max=20"`
+	Password         string `json:"password" gorm:"not null;" validate:"min=8,max=20"`
+	OriginalPassword string `json:"original_password" gorm:"-:all"` // this field is only for Password change verification, don't save it to database!
+	DisplayName      string `json:"display_name" gorm:"index" validate:"max=20"`
+	Role             int    `json:"role" gorm:"type:int;default:1"`   // admin, common
+	Status           int    `json:"status" gorm:"type:int;default:1"` // enabled, disabled
 	// SensitiveWordTriggerCount stores the cumulative number of blocked sensitive-word requests for risk review.
 	SensitiveWordTriggerCount int `json:"sensitive_word_trigger_count" gorm:"type:int;not null;default:0"`
+	// ProbeGuardTriggerCount stores the cumulative number of cross-model probe guard violations (warning + banned events, dry-run excluded).
+	ProbeGuardTriggerCount int `json:"probe_guard_trigger_count" gorm:"type:int;not null;default:0"`
 	// BanReason stores a predefined reason code or administrator-provided explanation for a disabled user.
-	BanReason        string         `json:"ban_reason,omitempty" gorm:"type:varchar(255)"`
-	Email                string                     `json:"email" gorm:"index" validate:"max=50"`
-	GitHubId             string                     `json:"github_id" gorm:"column:github_id;index"`
-	DiscordId            string                     `json:"discord_id" gorm:"column:discord_id;index"`
-	OidcId               string                     `json:"oidc_id" gorm:"column:oidc_id;index"`
-	WeChatId             string                     `json:"wechat_id" gorm:"column:wechat_id;index"`
-	TelegramId           string                     `json:"telegram_id" gorm:"column:telegram_id;index"`
-	VerificationCode     string                     `json:"verification_code" gorm:"-:all"`                         // this field is only for Email verification, don't save it to database!
-	AccessToken          *string                    `json:"-" gorm:"type:char(32);column:access_token;uniqueIndex"` // this token is for system management
-	AccessTokenCreatedAt *int64                     `json:"-" gorm:"type:bigint;column:access_token_created_at"`
-	Quota                int                        `json:"quota" gorm:"type:int;default:0"`
-	UsedQuota            int                        `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
-	RequestCount         int                        `json:"request_count" gorm:"type:int;default:0;"`               // request number
-	Group                string                     `json:"group" gorm:"type:varchar(64);default:'default'"`
-	AffCode              string                     `json:"aff_code" gorm:"type:varchar(32);column:aff_code;uniqueIndex"`
-	AffCount             int                        `json:"aff_count" gorm:"type:int;default:0;column:aff_count"`
-	AffQuota             int                        `json:"aff_quota" gorm:"type:int;default:0;column:aff_quota"`           // 邀请剩余额度
-	AffHistoryQuota      int                        `json:"aff_history_quota" gorm:"type:int;default:0;column:aff_history"` // 邀请历史额度
-	InviterId            int                        `json:"inviter_id" gorm:"type:int;column:inviter_id;index"`
-	DeletedAt            gorm.DeletedAt             `gorm:"index"`
-	LinuxDOId            string                     `json:"linux_do_id" gorm:"column:linux_do_id;index"`
+	BanReason        string  `json:"ban_reason,omitempty" gorm:"type:varchar(255)"`
+	Email            string  `json:"email" gorm:"index" validate:"max=50"`
+	GitHubId         string  `json:"github_id" gorm:"column:github_id;index"`
+	DiscordId        string  `json:"discord_id" gorm:"column:discord_id;index"`
+	OidcId           string  `json:"oidc_id" gorm:"column:oidc_id;index"`
+	WeChatId         string  `json:"wechat_id" gorm:"column:wechat_id;index"`
+	TelegramId       string  `json:"telegram_id" gorm:"column:telegram_id;index"`
+	VerificationCode string  `json:"verification_code" gorm:"-:all"`                         // this field is only for Email verification, don't save it to database!
+	AccessToken      *string `json:"-" gorm:"type:char(32);column:access_token;uniqueIndex"` // this token is for system management
+	Quota            int     `json:"quota" gorm:"type:int;default:0"`
+	UsedQuota        int     `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
+	RequestCount     int     `json:"request_count" gorm:"type:int;default:0;"`               // request number
+	Group            string  `json:"group" gorm:"type:varchar(64);default:'default'"`
+	AffCode          string  `json:"aff_code" gorm:"type:varchar(32);column:aff_code;uniqueIndex"`
+	// RegistrationCode 注册请求中携带的注册码，仅用于注册校验，不保存到数据库。
+	RegistrationCode string         `json:"registration_code" gorm:"-:all"`
+	AffCount         int            `json:"aff_count" gorm:"type:int;default:0;column:aff_count"`
+	AffQuota         int            `json:"aff_quota" gorm:"type:int;default:0;column:aff_quota"`           // 邀请剩余额度
+	AffHistoryQuota  int            `json:"aff_history_quota" gorm:"type:int;default:0;column:aff_history"` // 邀请历史额度
+	InviterId        int            `json:"inviter_id" gorm:"type:int;column:inviter_id;index"`
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
+	LinuxDOId        string         `json:"linux_do_id" gorm:"column:linux_do_id;index"`
 	// RegistrationSource records the account creation method using the RegistrationSource constants.
 	RegistrationSource int                        `json:"registration_source" gorm:"type:int;column:registration_source;index"`
-	Setting              string                     `json:"setting" gorm:"type:text;column:setting"`
-	Remark               string                     `json:"remark,omitempty" gorm:"type:varchar(255)" validate:"max=255"`
-	StripeCustomer       string                     `json:"stripe_customer" gorm:"type:varchar(64);column:stripe_customer;index"`
-	CreatedAt            int64                      `json:"created_at" gorm:"autoCreateTime;column:created_at"`
-	LastLoginAt          int64                      `json:"last_login_at" gorm:"default:0;column:last_login_at"`
-	LastLoginIp          string                     `json:"last_login_ip" gorm:"type:varchar(64);default:'';column:last_login_ip"` // 最近一次成功登录系统时使用的 IP 地址；仅保留最近一次，完整登录 IP 历史见登录审计日志
-	AuthVersion          int64                      `json:"-" gorm:"type:bigint;not null;default:1;column:auth_version"`
-	AdminPermissions     map[string]map[string]bool `json:"admin_permissions,omitempty" gorm:"-:all"`
+	Setting            string                     `json:"setting" gorm:"type:text;column:setting"`
+	Remark             string                     `json:"remark,omitempty" gorm:"type:varchar(255)" validate:"max=255"`
+	StripeCustomer     string                     `json:"stripe_customer" gorm:"type:varchar(64);column:stripe_customer;index"`
+	CreatedAt          int64                      `json:"created_at" gorm:"autoCreateTime;column:created_at"`
+	LastLoginAt        int64                      `json:"last_login_at" gorm:"default:0;column:last_login_at"`
+	LastLoginIp        string                     `json:"last_login_ip" gorm:"type:varchar(64);default:'';column:last_login_ip"` // 最近一次成功登录系统时使用的 IP 地址；仅保留最近一次，完整登录 IP 历史见登录审计日志
+	AuthVersion        int64                      `json:"-" gorm:"type:bigint;not null;default:1;column:auth_version"`
+	AdminPermissions   map[string]map[string]bool `json:"admin_permissions,omitempty" gorm:"-:all"`
 }
 
 func (user *User) ToBaseUser() *UserBase {
@@ -149,6 +150,7 @@ func (user *User) ToBaseUser() *UserBase {
 		Group:       user.Group,
 		Quota:       user.Quota,
 		Status:      user.Status,
+		BanReason:   user.BanReason,
 		Role:        user.Role,
 		Username:    user.Username,
 		Setting:     user.Setting,
@@ -176,9 +178,7 @@ func UpdateUserAccessToken(id int, token string) error {
 	if id == 0 {
 		return errors.New("id 为空！")
 	}
-	result := DB.Model(&User{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"access_token": token, "access_token_created_at": common.GetTimestamp(),
-	})
+	result := DB.Model(&User{}).Where("id = ?", id).Update("access_token", token)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -186,23 +186,6 @@ func UpdateUserAccessToken(id int, token string) error {
 		return gorm.ErrRecordNotFound
 	}
 	return nil
-}
-
-// RevokeUserAccessToken returns the generation actually revoked under the row lock.
-func RevokeUserAccessToken(id int) (string, error) {
-	var tokenRef string
-	err := DB.Transaction(func(tx *gorm.DB) error {
-		var user User
-		if err := lockForUpdate(tx).Select("id", "access_token").First(&user, id).Error; err != nil {
-			return err
-		}
-		tokenRef = AccessTokenFingerprint(user.GetAccessToken())
-		if tokenRef == "" {
-			return nil
-		}
-		return tx.Model(&User{}).Where("id = ?", id).Updates(map[string]interface{}{"access_token": nil, "access_token_created_at": nil}).Error
-	})
-	return tokenRef, err
 }
 
 func (user *User) GetSetting() dto.UserSetting {
@@ -413,16 +396,9 @@ func EnsureEmailAvailable(email string, excludeUserID int) error {
 //
 // An empty email is allowed to repeat and needs no serialization.
 func withNormalizedEmailLock(tx *gorm.DB, email string, fn func(tx *gorm.DB) error) error {
-	if err := lockNormalizedEmail(tx, email); err != nil {
-		return err
-	}
-	return fn(tx)
-}
-
-func lockNormalizedEmail(tx *gorm.DB, email string) error {
 	email = NormalizeEmail(email)
 	if email == "" {
-		return nil
+		return fn(tx)
 	}
 	switch {
 	case common.UsingMainDatabase(common.DatabaseTypePostgreSQL):
@@ -435,7 +411,7 @@ func lockNormalizedEmail(tx *gorm.DB, email string) error {
 			return err
 		}
 	}
-	return nil
+	return fn(tx)
 }
 
 func GetMaxUserId() int {
@@ -562,28 +538,6 @@ func GetUserById(id int, selectAll bool) (*User, error) {
 	return &user, err
 }
 
-// GetSelfUserById reads dashboard profile data and password existence in one
-// query. The password hash and management access token are never selected.
-func GetSelfUserById(id int) (*User, error) {
-	if id == 0 {
-		return nil, errors.New("id 为空！")
-	}
-	var profile struct {
-		User
-		HasPassword bool `gorm:"column:has_password"`
-	}
-	err := DB.Model(&User{}).Select([]string{
-		"id", "username", "display_name", "role", "status", "email",
-		"github_id", "discord_id", "oidc_id", "wechat_id", "telegram_id",
-		"group", "quota", "used_quota", "request_count", "aff_code", "aff_count",
-		"aff_quota", "aff_history", "inviter_id", "linux_do_id", "setting",
-		"stripe_customer", "auth_version",
-		"CASE WHEN password <> '' THEN 1 ELSE 0 END AS has_password",
-	}).First(&profile, "id = ?", id).Error
-	profile.User.HasPassword = profile.HasPassword
-	return &profile.User, err
-}
-
 func GetUserIdByAffCode(affCode string) (int, error) {
 	if affCode == "" {
 		return 0, errors.New("affCode 为空！")
@@ -670,7 +624,7 @@ func (user *User) prepareForInsert(tx *gorm.DB) error {
 		return nil
 	}
 	var err error
-	user.Password, err = common.HashAccountPassword(user.Password)
+	user.Password, err = common.Password2Hash(user.Password)
 	return err
 }
 
@@ -724,7 +678,9 @@ func (user *User) Insert(inviterId int) error {
 
 			// 初始化用户设置，包括默认的边栏配置
 			if user.Setting == "" {
-				defaultSetting := dto.UserSetting{}
+				defaultSetting := dto.UserSetting{
+					RecordIpLog: true,
+				}
 				// 这里暂时不设置SidebarModules，因为需要在用户创建后根据角色设置
 				user.SetSetting(defaultSetting)
 			}
@@ -789,7 +745,9 @@ func (user *User) InsertWithTx(tx *gorm.DB, inviterId int) error {
 
 		// 初始化用户设置
 		if user.Setting == "" {
-			defaultSetting := dto.UserSetting{}
+			defaultSetting := dto.UserSetting{
+				RecordIpLog: true,
+			}
 			user.SetSetting(defaultSetting)
 		}
 
@@ -889,7 +847,7 @@ func (user *User) Update(updatePassword bool) error {
 func (user *User) UpdateWithTx(tx *gorm.DB, updatePassword bool) error {
 	var err error
 	if updatePassword {
-		user.Password, err = common.HashAccountPassword(user.Password)
+		user.Password, err = common.Password2Hash(user.Password)
 		if err != nil {
 			return err
 		}
@@ -952,7 +910,7 @@ func (user *User) Edit(updatePassword bool) error {
 func (user *User) EditWithTx(tx *gorm.DB, updatePassword bool) error {
 	var err error
 	if updatePassword {
-		user.Password, err = common.HashAccountPassword(user.Password)
+		user.Password, err = common.Password2Hash(user.Password)
 		if err != nil {
 			return err
 		}
@@ -1026,32 +984,11 @@ func (user *User) ClearBinding(bindingType string) error {
 }
 
 func (user *User) Delete() error {
-	return user.delete(nil)
-}
-
-func DeleteUserForSession(identity AuthSessionIdentity) error {
-	user := User{Id: identity.UserID}
-	return user.delete(&identity)
-}
-
-func (user *User) delete(identity *AuthSessionIdentity) error {
 	if user.Id == 0 {
 		return errors.New("id 为空！")
 	}
 	var nextAuthVersion int64
 	if err := DB.Transaction(func(tx *gorm.DB) error {
-		if identity != nil {
-			if err := ValidateAuthSessionWithTx(tx, *identity); err != nil {
-				return err
-			}
-			var role int
-			if err := tx.Model(&User{}).Where("id = ?", user.Id).Select("role").Scan(&role).Error; err != nil {
-				return err
-			}
-			if role == common.RoleRootUser {
-				return ErrCannotDeleteRootUser
-			}
-		}
 		var err error
 		nextAuthVersion, err = IncrementUserAuthVersionWithTx(tx, user.Id)
 		if err != nil {
@@ -1148,8 +1085,11 @@ func (user *User) ValidateAndFill() (err error) {
 		return ErrInvalidCredentials
 	}
 	okay := common.ValidatePasswordAndHash(password, user.Password)
-	if !okay || user.Status != common.UserStatusEnabled {
+	if !okay {
 		return ErrInvalidCredentials
+	}
+	if user.Status != common.UserStatusEnabled {
+		return ErrUserDisabled
 	}
 	return nil
 }
@@ -1273,7 +1213,7 @@ func ResetUserPasswordByEmail(email string, password string) error {
 	if err != nil {
 		return err
 	}
-	hashedPassword, err := common.HashAccountPassword(password)
+	hashedPassword, err := common.Password2Hash(password)
 	if err != nil {
 		return err
 	}
@@ -1506,6 +1446,17 @@ func GetRootUser() (user *User) {
 func UpdateUserLastLoginAt(id int) {
 	if err := DB.Model(&User{}).Where("id = ?", id).Update("last_login_at", common.GetTimestamp()).Error; err != nil {
 		common.SysLog("failed to update user last_login_at: " + err.Error())
+	}
+}
+
+// UpdateUserLastLoginIp 记录用户最近一次成功登录所使用的 IP 地址。
+// 仅保留最近一次，完整登录 IP 历史由登录审计日志记录。
+func UpdateUserLastLoginIp(id int, ip string) {
+	if ip == "" {
+		return
+	}
+	if err := DB.Model(&User{}).Where("id = ?", id).Update("last_login_ip", ip).Error; err != nil {
+		common.SysLog("failed to update user last_login_ip: " + err.Error())
 	}
 }
 

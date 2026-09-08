@@ -86,18 +86,10 @@ export async function getTaskPluginVersions(key: string) {
   return requireSuccess(response.data)
 }
 
-/**
- * `icon` is the sidecar icon.svg / icon.png as a data URI. It is stored apart
- * from the source, so the JavaScript stays readable in diffs and reviews.
- */
-export async function uploadTaskPlugin(
-  source: string,
-  remark: string,
-  icon?: string
-) {
+export async function uploadTaskPlugin(source: string, remark: string) {
   const response = await api.post<ApiResponse<TaskPluginDetail>>(
     '/api/plugin/task',
-    { source, remark, icon: icon || undefined },
+    { source, remark },
     mutationConfig
   )
   return requireSuccess(response.data)
@@ -113,7 +105,6 @@ export async function installMarketplacePlugin(request: {
   source: string
   sourceSha256?: string
   remark: string
-  icon?: string
 }) {
   const response = await api.post<ApiResponse<TaskPluginDetail>>(
     '/api/plugin/task',
@@ -122,7 +113,6 @@ export async function installMarketplacePlugin(request: {
       sourceSha256: request.sourceSha256,
       enabled: true,
       remark: request.remark,
-      icon: request.icon || undefined,
     },
     mutationConfig
   )
@@ -186,8 +176,8 @@ export async function getTaskPluginEnabledOption() {
     )
   const options = requireSuccess(response.data)
   return (
-    options.find((option) => option.key === 'TaskPluginEnabled')?.value ===
-    'true'
+    options.find((option) => option.key === 'TaskPluginEnabled')
+      ?.value === 'true'
   )
 }
 

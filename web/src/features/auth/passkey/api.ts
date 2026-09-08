@@ -17,11 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { api } from '@/lib/api'
-import { authRequestOptions, authResult } from '@/lib/secure-verification'
 
 import type {
   SecurityProof,
-  VerificationOperation,
+  SecurityProofScope,
 } from '../secure-verification/types'
 import type { ApiResponse, PasskeyOptionsPayload, PasskeyStatus } from './types'
 
@@ -34,50 +33,39 @@ export async function getPasskeyStatus(): Promise<ApiResponse<PasskeyStatus>> {
   return res.data
 }
 
-export function beginPasskeyRegistration(
-  proofToken: string,
-  signal?: AbortSignal
-): Promise<PasskeyOptionsPayload> {
-  return authResult(
-    api.post('/api/user/passkey/register/begin', undefined, {
-      ...authRequestOptions,
-      headers: proofHeaders(proofToken),
-      signal,
-    })
+export async function beginPasskeyRegistration(
+  proofToken?: string
+): Promise<ApiResponse<PasskeyOptionsPayload>> {
+  const res = await api.post<ApiResponse<PasskeyOptionsPayload>>(
+    '/api/user/passkey/register/begin',
+    undefined,
+    { headers: proofHeaders(proofToken) }
   )
+  return res.data
 }
 
-export function finishPasskeyRegistration(
+export async function finishPasskeyRegistration(
   flowToken: string,
   payload: Record<string, unknown>,
-  signal?: AbortSignal
-): Promise<unknown> {
-  return authResult(
-    api.post(
-      '/api/user/passkey/register/finish',
-      { flow_token: flowToken, credential: payload },
-      {
-        ...authRequestOptions,
-        acceptAuthRotation: true,
-        singleUseAuthorization: true,
-        signal,
-      }
-    )
+  proofToken?: string
+): Promise<ApiResponse> {
+  const res = await api.post<ApiResponse>(
+    '/api/user/passkey/register/finish',
+    {
+      flow_token: flowToken,
+      credential: payload,
+    },
+    { headers: proofHeaders(proofToken), acceptAuthRotation: true }
   )
+  return res.data
 }
 
-export function deletePasskey(
-  proofToken: string,
-  signal?: AbortSignal
-): Promise<unknown> {
-  return authResult(
-    api.delete('/api/user/passkey', {
-      ...authRequestOptions,
-      headers: proofHeaders(proofToken),
-      acceptAuthRotation: true,
-      signal,
-    })
-  )
+export async function deletePasskey(proofToken?: string): Promise<ApiResponse> {
+  const res = await api.delete<ApiResponse>('/api/user/passkey', {
+    headers: proofHeaders(proofToken),
+    acceptAuthRotation: true,
+  })
+  return res.data
 }
 
 export async function beginPasskeyLogin(): Promise<
@@ -101,32 +89,23 @@ export async function finishPasskeyLogin(
   return res.data
 }
 
-export function beginPasskeyVerification(
-  operation: VerificationOperation,
-  signal?: AbortSignal
-): Promise<PasskeyOptionsPayload> {
-  return authResult(
-    api.post(
-      '/api/user/passkey/verify/begin',
-      {
-        scope: operation.scope,
-        ...(operation.context ? { context: operation.context } : {}),
-      },
-      { ...authRequestOptions, signal }
-    )
+export async function beginPasskeyVerification(
+  scope: SecurityProofScope
+): Promise<ApiResponse<PasskeyOptionsPayload>> {
+  const res = await api.post<ApiResponse<PasskeyOptionsPayload>>(
+    '/api/user/passkey/verify/begin',
+    { scope }
   )
+  return res.data
 }
 
-export function finishPasskeyVerification(
+export async function finishPasskeyVerification(
   flowToken: string,
-  payload: Record<string, unknown>,
-  signal?: AbortSignal
-): Promise<SecurityProof> {
-  return authResult(
-    api.post(
-      '/api/user/passkey/verify/finish',
-      { flow_token: flowToken, credential: payload },
-      { ...authRequestOptions, singleUseAuthorization: true, signal }
-    )
+  payload: Record<string, unknown>
+): Promise<ApiResponse<SecurityProof>> {
+  const res = await api.post<ApiResponse<SecurityProof>>(
+    '/api/user/passkey/verify/finish',
+    { flow_token: flowToken, credential: payload }
   )
+  return res.data
 }

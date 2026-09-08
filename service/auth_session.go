@@ -86,32 +86,15 @@ func createLoginSession(userID int, expectedAuthVersion int64, loginMethod, ip, 
 	if issuanceCount >= int64(common.UserSessionIssuanceLimit) {
 		return nil, model.ErrUserSessionIssuanceLimit
 	}
-	session, refreshSecret, err := newLoginSession(userID, user.AuthVersion, loginMethod, ip, userAgent)
-	if err != nil {
-		return nil, err
-	}
-	if err := model.CreateUserSession(session); err != nil {
-		return nil, err
-	}
-	bundle, err := issueAuthBundle(session, session.SID+"."+refreshSecret, true)
-	if err != nil {
-		_, _ = model.RevokeUserSession(userID, session.SID, "token_issue_failed")
-		return nil, err
-	}
-	return bundle, nil
-}
-
-func newLoginSession(userID int, authVersion int64, loginMethod, ip, userAgent string) (*model.UserSession, string, error) {
 	refreshSecret, err := common.GenerateRandomCharsKey(64)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	now := time.Now().Unix()
 	session := &model.UserSession{
 		SID:             uuid.NewString(),
 		UserID:          userID,
 		Version:         1,
-		UserAuthVersion: authVersion,
+		UserAuthVersion: user.AuthVersion,
 		Status:          model.UserSessionStatusActive,
 		RefreshHash:     hashRefreshSecret(refreshSecret),
 		LoginMethod:     strings.TrimSpace(loginMethod),
@@ -124,7 +107,15 @@ func newLoginSession(userID int, authVersion int64, loginMethod, ip, userAgent s
 	if session.LoginMethod == "" {
 		session.LoginMethod = "unknown"
 	}
-	return session, refreshSecret, nil
+	if err := model.CreateUserSession(session); err != nil {
+		return nil, err
+	}
+	bundle, err := issueAuthBundle(session, session.SID+"."+refreshSecret, true)
+	if err != nil {
+		_, _ = model.RevokeUserSession(userID, session.SID, "token_issue_failed")
+		return nil, err
+	}
+	return bundle, nil
 }
 
 func ValidateLoginSession(identity AuthIdentity) (*model.UserSession, *model.UserBase, error) {
@@ -236,7 +227,7 @@ func RefreshLoginSession(rawRefreshToken, expectedSID, ip, userAgent string) (*A
 	if err != nil {
 		return nil, nil, err
 	}
-	currentUser, err := model.GetSelfUserById(session.UserID)
+	currentUser, err := model.GetUserById(session.UserID, false)
 	if err != nil {
 		return nil, nil, err
 	}

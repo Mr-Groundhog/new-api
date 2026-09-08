@@ -23,7 +23,6 @@ import { toast } from 'sonner'
 import {
   applyAuthRotation,
   clearAuthentication,
-  getFreshAuthHeaders,
   refreshAuthentication,
 } from '@/lib/auth-session'
 import { getServerErrorMessageKey } from '@/lib/server-error-message'
@@ -37,7 +36,6 @@ declare module 'axios' {
     skipAuthRefresh?: boolean
     authRetry?: boolean
     acceptAuthRotation?: boolean
-    singleUseAuthorization?: boolean
   }
 }
 
@@ -47,8 +45,7 @@ export const api = axios.create({
   baseURL: '',
   withCredentials: true,
   headers: {
-    // no-store forbids storage; no-cache also revalidates any older cached response.
-    'Cache-Control': 'no-cache, no-store',
+    'Cache-Control': 'no-store',
   },
 })
 
@@ -153,20 +150,7 @@ api.interceptors.response.use(
   }
 )
 
-api.interceptors.request.use(async (config) => {
-  if (config.singleUseAuthorization || config.headers.has('X-Security-Proof')) {
-    // Refresh before spending a proof/flow, never by replaying its request.
-    config.skipAuthRefresh = true
-    try {
-      const headers = await getFreshAuthHeaders()
-      for (const [name, value] of Object.entries(headers)) {
-        config.headers.set(name, value)
-      }
-    } catch (error) {
-      throw axios.AxiosError.from(error, undefined, config)
-    }
-    return config
-  }
+api.interceptors.request.use((config) => {
   const accessToken = useAuthStore.getState().auth.accessToken
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`

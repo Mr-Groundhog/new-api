@@ -47,7 +47,6 @@ const DEFAULT_SIDEBAR_MODULES: SidebarModulesAdminConfig = {
     detail: true,
     token: true,
     log: true,
-    audit: true,
     midjourney: true,
     task: true,
   },
@@ -55,15 +54,18 @@ const DEFAULT_SIDEBAR_MODULES: SidebarModulesAdminConfig = {
     enabled: true,
     topup: true,
     personal: true,
-    security: true,
     welfareAirdrop: true,
+    ticket: true,
   },
   admin: {
     enabled: true,
     channel: true,
     models: true,
     redemption: true,
+    ticket: true,
     user: true,
+    sensitiveWordTriggers: true,
+    userRankings: true,
     setting: true,
     subscription: true,
   },
@@ -106,19 +108,24 @@ const URL_TO_CONFIG_MAP: Record<string, { section: string; module: string }> = {
   '/keys': { section: 'console', module: 'token' },
   '/usage-logs': { section: 'console', module: 'log' },
   '/usage-logs/common': { section: 'console', module: 'log' },
-  '/usage-logs/audit': { section: 'console', module: 'audit' },
   '/usage-logs/drawing': { section: 'console', module: 'midjourney' },
   '/usage-logs/task': { section: 'console', module: 'task' },
+  '/welfare-airdrop': { section: 'personal', module: 'welfareAirdrop' },
+  '/tickets': { section: 'personal', module: 'ticket' },
+  '/ticket-management': { section: 'admin', module: 'ticket' },
   '/wallet': { section: 'personal', module: 'topup' },
   '/profile': { section: 'personal', module: 'personal' },
-  '/security': { section: 'personal', module: 'security' },
-  '/welfare-airdrop': { section: 'personal', module: 'welfareAirdrop' },
   '/channels': { section: 'admin', module: 'channel' },
   '/models': { section: 'admin', module: 'models' },
   '/models/metadata': { section: 'admin', module: 'models' },
   '/models/deployments': { section: 'admin', module: 'models' },
   '/users': { section: 'admin', module: 'user' },
   '/redemption-codes': { section: 'admin', module: 'redemption' },
+  '/sensitive-word-violations': {
+    section: 'admin',
+    module: 'sensitiveWordTriggers',
+  },
+  '/user-ranking': { section: 'admin', module: 'userRankings' },
   '/subscriptions': { section: 'admin', module: 'subscription' },
   '/system-settings': { section: 'admin', module: 'setting' },
   '/system-settings/site': { section: 'admin', module: 'setting' },
@@ -334,4 +341,21 @@ export function useIsSidebarModuleVisible(url: string): boolean {
       : parseUserSidebarConfig(auth?.user?.sidebar_modules)
 
   return isModuleEnabled(url, adminConfig, userConfig)
+}
+
+/**
+ * Check whether a single route is visible under the admin-level
+ * SidebarModulesAdmin config ONLY — the user's personal narrowing overlay is
+ * deliberately not applied. Used for action availability that must stay in
+ * sync with the server-side gate (e.g. the "new ticket" entry, whose writes
+ * are guarded by the same admin switch): a user who merely hid the sidebar
+ * entry for themselves must not lose an action the server still allows.
+ */
+export function useIsAdminSidebarModuleVisible(url: string): boolean {
+  const { status } = useStatus()
+
+  const adminConfig = parseSidebarConfig(
+    status?.SidebarModulesAdmin as string | null | undefined
+  )
+  return isModuleEnabled(url, adminConfig, null)
 }

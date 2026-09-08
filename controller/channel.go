@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -422,19 +421,20 @@ func GetChannel(c *gin.Context) {
 // 此函数依赖 SecureVerificationRequired 中间件，确保用户已通过安全验证
 func GetChannelKey(c *gin.Context) {
 	channelId, err := strconv.Atoi(c.Param("id"))
-	if err != nil || channelId <= 0 {
-		common.ApiErrorMsg(c, "渠道ID格式错误")
+	if err != nil {
+		common.ApiError(c, fmt.Errorf("渠道ID格式错误: %v", err))
 		return
 	}
 
 	// 获取渠道信息（包含密钥）
 	channel, err := model.GetChannelById(channelId, true)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		common.ApiErrorI18n(c, i18n.MsgChannelNotExists)
+	if err != nil {
+		common.ApiError(c, fmt.Errorf("获取渠道信息失败: %v", err))
 		return
 	}
-	if err != nil {
-		writeSecurityOperationError(c, err)
+
+	if channel == nil {
+		common.ApiError(c, fmt.Errorf("渠道不存在"))
 		return
 	}
 
@@ -452,6 +452,23 @@ func GetChannelKey(c *gin.Context) {
 			"key": channel.Key,
 		},
 	})
+}
+
+// validateTwoFactorAuth 统一的2FA验证函数
+func validateTwoFactorAuth(twoFA *model.TwoFA, code string) bool {
+	// 尝试验证TOTP
+	if cleanCode, err := common.ValidateNumericCode(code); err == nil {
+		if isValid, _ := twoFA.ValidateTOTPAndUpdateUsage(cleanCode); isValid {
+			return true
+		}
+	}
+
+	// 尝试验证备用码
+	if isValid, err := twoFA.ValidateBackupCodeAndUpdateUsage(code); err == nil && isValid {
+		return true
+	}
+
+	return false
 }
 
 // validateChannel 通用的渠道校验函数
@@ -472,19 +489,11 @@ func validateChannel(channel *model.Channel, isAdd bool) error {
 		if len(pluginKey) > 30 {
 			return fmt.Errorf("task plugin key must not exceed 30 characters")
 		}
-		plugin, ok := jsplugin.DefaultRegistry.Get(pluginKey)
-		if !ok {
+		if _, ok := jsplugin.DefaultRegistry.Get(pluginKey); !ok {
 			return fmt.Errorf("task plugin %q is not registered", pluginKey)
 		}
 		if channel.BaseURL == nil || strings.TrimSpace(*channel.BaseURL) == "" {
-			// The plugin default is persisted onto the channel instead of being
-			// resolved per request, so the destination host stays an auditable
-			// channel property that only an administrator edit can change.
-			if plugin.Meta.BaseURL == "" {
-				return fmt.Errorf("base URL is required for task plugin channels")
-			}
-			defaultBaseURL := plugin.Meta.BaseURL
-			channel.BaseURL = &defaultBaseURL
+			return fmt.Errorf("base URL is required for task plugin channels")
 		}
 	}
 
@@ -633,9 +642,6 @@ func AddChannel(c *gin.Context) {
 		return
 	}
 
-	baseURLFromPluginDefault := addChannelRequest.Channel != nil &&
-		addChannelRequest.Channel.Type == constant.ChannelTypeTaskPlugin &&
-		(addChannelRequest.Channel.BaseURL == nil || strings.TrimSpace(*addChannelRequest.Channel.BaseURL) == "")
 	// 使用统一的校验函数
 	if err := validateChannel(addChannelRequest.Channel, true); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -720,15 +726,11 @@ func AddChannel(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
-	createAudit := map[string]interface{}{
+	recordManageAudit(c, "channel.create", map[string]interface{}{
 		"name":  addChannelRequest.Channel.Name,
 		"type":  addChannelRequest.Channel.Type,
 		"count": len(channels),
-	}
-	if baseURLFromPluginDefault {
-		createAudit["base_url_source"] = "plugin_default"
-	}
-	recordManageAudit(c, "channel.create", createAudit)
+	})
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -996,8 +998,6 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
-	baseURLFromPluginDefault := channel.Type == constant.ChannelTypeTaskPlugin &&
-		(channel.BaseURL == nil || strings.TrimSpace(*channel.BaseURL) == "")
 	// 使用统一的校验函数
 	if err := validateChannel(&channel.Channel, false); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -1143,15 +1143,11 @@ func UpdateChannel(c *gin.Context) {
 	if channel.Key != "" && channel.Key != originChannel.Key {
 		changedFields = append(changedFields, "key")
 	}
-	updateAudit := map[string]interface{}{
+	recordManageAudit(c, "channel.update", map[string]interface{}{
 		"id":             channel.Id,
 		"name":           channel.Name,
 		"changed_fields": changedFields,
-	}
-	if baseURLFromPluginDefault {
-		updateAudit["base_url_source"] = "plugin_default"
-	}
-	recordManageAudit(c, "channel.update", updateAudit)
+	})
 	channel.Key = ""
 	clearChannelInfo(&channel.Channel)
 	c.JSON(http.StatusOK, gin.H{

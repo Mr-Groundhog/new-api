@@ -85,16 +85,16 @@ func PostSetup(c *gin.Context) {
 			return
 		}
 
-		if err := common.ValidateNewAccountPassword(req.Password); err != nil {
+		if len(req.Password) < 8 {
 			c.JSON(200, gin.H{
 				"success": false,
-				"message": err.Error(),
+				"message": "密码长度至少为8个字符",
 			})
 			return
 		}
 
 		// Create root user
-		hashedPassword, err := common.HashAccountPassword(req.Password)
+		hashedPassword, err := common.Password2Hash(req.Password)
 		if err != nil {
 			c.JSON(200, gin.H{
 				"success": false,

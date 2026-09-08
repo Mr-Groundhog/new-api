@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { useDataTable } from '@/components/data-table'
 import { SectionPageLayout } from '@/components/layout'
 import { Button } from '@/components/ui/button'
-import { useIsSidebarModuleVisible } from '@/hooks/use-sidebar-config'
+import { useIsAdminSidebarModuleVisible } from '@/hooks/use-sidebar-config'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
 
 import { getSelfTickets, ticketQueryKeys } from './api'
@@ -48,7 +48,7 @@ export function TicketFeedback() {
 
   // 「新增工单」入口用管理员级开关判定，与服务端 TicketWriteEnabled 同源；
   // 不叠加用户个人收窄层，避免个人隐藏侧边栏的用户被误禁新增
-  const canCreate = useIsSidebarModuleVisible('/tickets')
+  const canCreate = useIsAdminSidebarModuleVisible('/tickets')
 
   const { pagination, onPaginationChange, ensurePageInRange } =
     useTableUrlState({

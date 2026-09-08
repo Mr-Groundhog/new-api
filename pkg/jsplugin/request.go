@@ -23,9 +23,7 @@ func ValidateRequestURL(requestURL, baseURL string, allowedHosts []string) error
 		return nil
 	}
 	for _, allowed := range allowedHosts {
-		// Parse with the request scheme so "host:443" matches an https request
-		// the same way an explicit default port on the request URL does.
-		allowedURL, parseErr := url.Parse(request.Scheme + "://" + strings.TrimSpace(allowed))
+		allowedURL, parseErr := url.Parse("https://" + strings.TrimSpace(allowed))
 		if parseErr == nil && requestHost == canonicalHost(allowedURL) {
 			return nil
 		}
