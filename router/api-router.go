@@ -75,6 +75,10 @@ func SetApiRouter(router *gin.Engine) {
 			userRoute.POST("/auth/refresh", middleware.SessionCookieOriginGuard(), middleware.CriticalRateLimit(), middleware.DisableCache(), controller.RefreshAuth)
 			userRoute.POST("/auth/logout", middleware.SessionCookieOriginGuard(), middleware.CriticalRateLimit(), middleware.DisableCache(), controller.AuthLogout)
 			userRoute.POST("/register", middleware.CriticalRateLimit(), anonymousRequestBodyLimit, middleware.TurnstileCheck(), controller.Register)
+			// Anonymous pre-check of a registration code (read-only, does not
+			// consume it). Uses a dedicated rate limit to avoid sharing the
+			// registration/login quota while still resisting enumeration.
+			userRoute.GET("/registration-code/check", middleware.RegistrationCodeCheckRateLimit(), middleware.DisableCache(), controller.CheckRegistrationCode)
 			userRoute.GET("/login/encryption-key", middleware.DisableCache(), controller.GetPasswordEncryptionKey)
 			userRoute.POST("/login", middleware.CriticalRateLimit(), middleware.DisableCache(), anonymousRequestBodyLimit, middleware.TurnstileCheck(), controller.Login)
 			userRoute.POST("/login/2fa", middleware.CriticalRateLimit(), middleware.DisableCache(), anonymousRequestBodyLimit, controller.Verify2FALogin)
@@ -274,6 +278,19 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/task_plugin_options", middleware.AdminAuth(), middleware.RequirePermission(authz.TaskPluginBind), controller.GetTaskPluginOptions)
 		registerChannelRoutes(apiRouter)
 		registerAuthzRoutes(apiRouter)
+
+		// Registration code management (admin only)
+		registrationCodeRoute := apiRouter.Group("/registration-code")
+		registrationCodeRoute.Use(middleware.AdminAuth())
+		{
+			registrationCodeRoute.GET("/", controller.GetAllRegistrationCodes)
+			registrationCodeRoute.GET("/search", controller.SearchRegistrationCodes)
+			registrationCodeRoute.GET("/:id", controller.GetRegistrationCode)
+			registrationCodeRoute.POST("/", controller.AddRegistrationCode)
+			registrationCodeRoute.PUT("/", controller.UpdateRegistrationCode)
+			registrationCodeRoute.DELETE("/invalid", controller.DeleteInvalidRegistrationCode)
+			registrationCodeRoute.DELETE("/:id", controller.DeleteRegistrationCode)
+		}
 		tokenRoute := apiRouter.Group("/token")
 		tokenRoute.Use(middleware.UserAuth())
 		tokenRoute.Use(middleware.TokenOperationAudit())

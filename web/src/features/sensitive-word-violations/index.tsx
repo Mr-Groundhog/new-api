@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import {
   banSensitiveWordViolationUser,
@@ -24,6 +25,7 @@ import {
   type SensitiveWordViolationFilters,
   type SensitiveWordViolationUser,
 } from './api'
+import { ProbeGuardTab } from './components/probe-guard-tab'
 
 function formatTime(timestamp: number) {
   return new Date(timestamp * 1000).toLocaleString()
@@ -87,7 +89,7 @@ function UserDetails(props: { user: SensitiveWordViolationUser; filters: Sensiti
   )
 }
 
-export function SensitiveWordViolations() {
+export function RiskControlCenter() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [userFilter, setUserFilter] = useState('')
@@ -134,8 +136,14 @@ export function SensitiveWordViolations() {
 
   return (
     <SectionPageLayout fixedContent>
-      <SectionPageLayout.Title>{t('Sensitive Word Triggers')}</SectionPageLayout.Title>
+      <SectionPageLayout.Title>{t('Risk Control Center')}</SectionPageLayout.Title>
       <SectionPageLayout.Content>
+        <Tabs className='h-full min-h-0' defaultValue='sensitive-word-triggers'>
+          <TabsList className='group-data-horizontal/tabs:h-auto max-w-full flex-wrap justify-start'>
+            <TabsTrigger value='sensitive-word-triggers'>{t('Sensitive Word Triggers')}</TabsTrigger>
+            <TabsTrigger value='liveness-check-list'>{t('Liveness Check List')}</TabsTrigger>
+          </TabsList>
+          <TabsContent className='min-h-0' value='sensitive-word-triggers'>
         <div className='flex h-full min-h-0 flex-col gap-3'>
           <div className='bg-muted/20 flex flex-wrap items-end gap-3 rounded-lg border p-3'>
             <div className='flex min-w-52 flex-1 flex-col gap-1.5'><label htmlFor='sensitive-word-user' className='text-sm font-medium'>{t('User')}</label><Input id='sensitive-word-user' value={userFilter} onChange={(event) => setUserFilter(event.target.value)} placeholder={t('Filter by username')} onKeyDown={(event) => event.key === 'Enter' && handleSearch()} /></div>
@@ -177,6 +185,11 @@ export function SensitiveWordViolations() {
             <Button type='button' variant='destructive' disabled={selectedIds.size === 0} onClick={() => setDeleteOpen(true)}><Trash2 />{t('Delete records')}</Button>
           </div>
         </div>
+          </TabsContent>
+          <TabsContent className='min-h-0' value='liveness-check-list'>
+            <ProbeGuardTab />
+          </TabsContent>
+        </Tabs>
       </SectionPageLayout.Content>
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>

@@ -136,6 +136,10 @@ export function SidebarModulesSection({
         title: t('Security & Access'),
         description: t('Manage your security settings and account access'),
       },
+      welfareAirdrop: {
+        title: t('Welfare Airdrop'),
+        description: t('Limited-time credit giveaways users can claim.'),
+      },
     },
     admin: {
       channel: {

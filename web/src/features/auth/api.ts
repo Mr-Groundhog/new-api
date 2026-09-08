@@ -36,6 +36,7 @@ import type {
   Login2FAResponse,
   TwoFAPayload,
   RegisterPayload,
+  RegistrationCodeCheckResult,
   ApiResponse,
 } from './types'
 
@@ -247,6 +248,19 @@ export async function telegramLogin(
 export async function register(payload: RegisterPayload): Promise<ApiResponse> {
   const res = await api.post(`/api/user/register`, payload, {
     params: { turnstile: payload.turnstile ?? '' },
+  })
+  return res.data
+}
+
+// Pre-check a registration code without consuming it (anonymous, used by the
+// sign-up form to give real-time valid/invalid/used/expired feedback).
+export async function checkRegistrationCode(
+  code: string
+): Promise<ApiResponse<RegistrationCodeCheckResult>> {
+  const res = await api.get('/api/user/registration-code/check', {
+    params: { code },
+    skipAuthRefresh: true,
+    skipErrorHandler: true,
   })
   return res.data
 }
