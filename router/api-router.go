@@ -175,6 +175,17 @@ func SetApiRouter(router *gin.Engine) {
 			sensitiveRoute.POST("/delete", controller.DeleteSensitiveWordViolations)
 			sensitiveRoute.POST("/ban", controller.BanSensitiveWordViolationUser)
 			sensitiveRoute.POST("/reset-count", controller.ResetSensitiveWordViolationCount)
+			sensitiveRoute.POST("/clear-user", controller.ClearSensitiveWordViolationUser)
+		}
+
+		probeGuardRoute := apiRouter.Group("/probe-guard")
+		probeGuardRoute.Use(middleware.AdminAuth())
+		{
+			probeGuardRoute.GET("/logs", controller.GetProbeGuardLogs)
+			probeGuardRoute.GET("/users", controller.GetProbeGuardLogUsers)
+			probeGuardRoute.POST("/delete", controller.DeleteProbeGuardLogs)
+			probeGuardRoute.POST("/ban", controller.BanProbeGuardUser)
+			probeGuardRoute.POST("/reset-count", controller.ResetProbeGuardCount)
 		}
 
 		// Subscription billing (plans, purchase, admin management)
