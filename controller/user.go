@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/i18n"
@@ -104,44 +103,27 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// 检查是否启用2FA
-	twoFAEnabled, err := model.IsTwoFAEnabled(user.Id)
-	if err != nil {
-		common.SysLog(fmt.Sprintf("Login failed to load 2FA status for user %d: %v", user.Id, err))
-		common.ApiErrorI18n(c, i18n.MsgDatabaseError)
-		return
-	}
-	if twoFAEnabled {
-		expiresAt := time.Now().Add(5 * time.Minute)
-		payload, err := common.Marshal(twoFALoginFlowPayload{AuthVersion: user.AuthVersion})
-		if err != nil {
-			common.ApiError(c, err)
-			return
-		}
-		flowToken, _, err := model.CreateAuthFlow(model.AuthFlowCreate{
-			Purpose:   model.AuthFlowPurposeTwoFALogin,
-			UserId:    user.Id,
-			Payload:   string(payload),
-			ExpiresAt: expiresAt,
-		})
-		if err != nil {
-			common.ApiError(c, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message": i18n.T(c, i18n.MsgUserRequire2FA),
-			"success": true,
-			"data": map[string]interface{}{
-				"require_2fa": true,
-				"flow_token":  flowToken,
-				"expires_at":  expiresAt.Unix(),
-			},
-		})
-		return
-	}
-
 	setupLogin(&user, c)
+}
+
+// writeLoginResponse 输出登录成功响应：写入刷新 Cookie、记录登录审计并返回访问令牌与用户信息。
+func writeLoginResponse(c *gin.Context, user *model.User, bundle *service.AuthBundle) {
+	c.Set("login_method", bundle.Session.LoginMethod)
+	model.UpdateUserLastLoginAt(user.Id)
+	service.WriteRefreshCookie(c, bundle.RefreshToken)
+	setAuthNoStore(c)
+	recordLoginAudit(user, c)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "",
+		"success": true,
+		"data": gin.H{
+			"access_token":      bundle.AccessToken,
+			"token_type":        bundle.TokenType,
+			"access_expires_at": bundle.AccessExpiresAt,
+			"session":           bundle.Session,
+			"user":              buildSelfUserData(user),
+		},
+	})
 }
 
 // loginMethodFromContext 根据请求路径推导登录方式，用于登录审计日志。
@@ -455,34 +437,6 @@ func GetUser(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data":    user,
-	})
-	return
-}
-
-func GenerateAccessToken(c *gin.Context) {
-	id := c.GetInt("id")
-	// get rand int 28-32
-	randI := common.GetRandomInt(4)
-	key, err := common.GenerateRandomKey(29 + randI)
-	if err != nil {
-		common.ApiErrorI18n(c, i18n.MsgGenerateFailed)
-		common.SysLog("failed to generate key: " + err.Error())
-		return
-	}
-	if model.DB.Where("access_token = ?", key).First(&model.User{}).RowsAffected != 0 {
-		common.ApiErrorI18n(c, i18n.MsgUuidDuplicate)
-		return
-	}
-
-	if err := model.UpdateUserAccessToken(id, key); err != nil {
-		common.ApiError(c, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-		"data":    key,
 	})
 	return
 }
@@ -1484,51 +1438,6 @@ func BanUserByCondition(c *gin.Context) {
 	}
 
 	common.ApiSuccess(c, gin.H{"success": true, "banned": len(targetIDs)})
-}
-
-type emailBindRequest struct {
-	Email string `json:"email"`
-	Code  string `json:"code"`
-}
-
-func EmailBind(c *gin.Context) {
-	var req emailBindRequest
-	if err := common.DecodeJson(c.Request.Body, &req); err != nil {
-		common.ApiError(c, errors.New("invalid request body"))
-		return
-	}
-	email := req.Email
-	email = model.NormalizeEmail(email)
-	code := req.Code
-	if !common.VerifyCodeWithKey(email, code, common.EmailVerificationPurpose) {
-		common.ApiErrorI18n(c, i18n.MsgUserVerificationCodeError)
-		return
-	}
-	user := model.User{
-		Id: c.GetInt("id"),
-	}
-	if user.Id == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "not authenticated"})
-		return
-	}
-	err := user.FillUserById()
-	if err != nil {
-		common.ApiError(c, err)
-		return
-	}
-	if err := model.BindEmailToUser(&user, email); err != nil {
-		if errors.Is(err, model.ErrEmailAlreadyTaken) {
-			common.ApiErrorI18n(c, i18n.MsgUserEmailAlreadyTaken)
-			return
-		}
-		common.ApiError(c, err)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-	})
-	return
 }
 
 type topUpRequest struct {

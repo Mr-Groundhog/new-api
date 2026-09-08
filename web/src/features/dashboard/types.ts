@@ -268,6 +268,7 @@ export interface AnnouncementItem {
 // ============================================================================
 
 export interface BroadcastItem {
+  id?: number
   content: string
   type?: 'default' | 'ongoing' | 'success' | 'warning' | 'error'
   extra?: string

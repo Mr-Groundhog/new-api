@@ -139,11 +139,11 @@ export function transformRedemptionToFormDefaults(
         ? new Date(redemption.expired_time * 1000)
         : undefined,
     count: 1,
-    is_airdrop: redemption.is_airdrop,
-    airdrop_batch_id: redemption.airdrop_batch_id,
+    is_airdrop: redemption.is_airdrop ?? false,
+    airdrop_batch_id: redemption.airdrop_batch_id ?? '',
     valid_until:
-      redemption.valid_until > 0
-        ? new Date(redemption.valid_until * 1000)
+      (redemption.valid_until ?? 0) > 0
+        ? new Date((redemption.valid_until ?? 0) * 1000)
         : undefined,
   };
 }

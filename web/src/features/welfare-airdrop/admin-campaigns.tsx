@@ -83,11 +83,13 @@ function AdminCampaignRow({
           {enabled ? t('Disable') : t('Enable')}
         </Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" size="sm">
-              {t('Delete')}
-            </Button>
-          </AlertDialogTrigger>
+          <AlertDialogTrigger
+            render={
+              <Button type="button" variant="destructive" size="sm">
+                {t('Delete')}
+              </Button>
+            }
+          />
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>{t('Delete campaign')}</AlertDialogTitle>

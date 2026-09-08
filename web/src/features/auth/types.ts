@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import type { BroadcastItem } from '@/features/dashboard/types'
 import type { AuthBundle } from '@/stores/auth-store'
 
 // ============================================================================

@@ -28,7 +28,7 @@ export {
   sendPasswordResetEmail,
   sendEmailVerification,
   bindEmail,
-  createOAuthFlow,
+  createOAuthAuthorization,
   githubOAuthStart,
   wechatLoginByCode,
   telegramLogin,

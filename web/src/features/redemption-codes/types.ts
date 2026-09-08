@@ -33,9 +33,9 @@ export const redemptionSchema = z.object({
   redeemed_time: z.number(),
   expired_time: z.number(), // 0 for never expires
   used_user_id: z.number(),
-  is_airdrop: z.boolean(),
-  airdrop_batch_id: z.string(),
-  valid_until: z.number(),
+  is_airdrop: z.boolean().optional(),
+  airdrop_batch_id: z.string().optional(),
+  valid_until: z.number().optional(),
 });
 
 export type Redemption = z.infer<typeof redemptionSchema>;

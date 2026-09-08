@@ -101,6 +101,8 @@ type User struct {
 	Id               int    `json:"id"`
 	Username         string `json:"username" gorm:"unique;index" validate:"max=20"`
 	Password         string `json:"password" gorm:"not null;" validate:"min=8,max=20"`
+	// HasPassword 仅用于查询结果标记该用户是否已设置密码，不映射到数据库列。
+	HasPassword      bool   `json:"-" gorm:"-:all"`
 	OriginalPassword string `json:"original_password" gorm:"-:all"` // this field is only for Password change verification, don't save it to database!
 	DisplayName      string `json:"display_name" gorm:"index" validate:"max=20"`
 	Role             int    `json:"role" gorm:"type:int;default:1"`   // admin, common
@@ -119,7 +121,9 @@ type User struct {
 	TelegramId       string  `json:"telegram_id" gorm:"column:telegram_id;index"`
 	VerificationCode string  `json:"verification_code" gorm:"-:all"`                         // this field is only for Email verification, don't save it to database!
 	AccessToken      *string `json:"-" gorm:"type:char(32);column:access_token;uniqueIndex"` // this token is for system management
-	Quota            int     `json:"quota" gorm:"type:int;default:0"`
+	// AccessTokenCreatedAt 记录访问令牌的创建时间（Unix 秒），令牌轮换后用于判定旧令牌失效。
+	AccessTokenCreatedAt *int64 `json:"-" gorm:"type:bigint;column:access_token_created_at"`
+	Quota                int    `json:"quota" gorm:"type:int;default:0"`
 	UsedQuota        int     `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
 	RequestCount     int     `json:"request_count" gorm:"type:int;default:0;"`               // request number
 	Group            string  `json:"group" gorm:"type:varchar(64);default:'default'"`
@@ -431,6 +435,92 @@ func withNormalizedEmailLock(tx *gorm.DB, email string, fn func(tx *gorm.DB) err
 		}
 	}
 	return fn(tx)
+}
+
+// lockNormalizedEmail 在事务内对规范化后的邮箱加锁，避免并发绑定/注册时邮箱唯一性竞争。
+// PostgreSQL 使用事务级咨询锁；MySQL/SQLite 通过 SELECT ... FOR UPDATE 行锁退化处理。
+func lockNormalizedEmail(tx *gorm.DB, email string) error {
+	email = NormalizeEmail(email)
+	if email == "" {
+		return nil
+	}
+	switch {
+	case common.UsingMainDatabase(common.DatabaseTypePostgreSQL):
+		if err := tx.Exec("SELECT pg_advisory_xact_lock(hashtext(?))", email).Error; err != nil {
+			return err
+		}
+	case common.UsingMainDatabase(common.DatabaseTypeMySQL):
+		var ids []int
+		if err := tx.Raw("SELECT id FROM users WHERE email = ? FOR UPDATE", email).Scan(&ids).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// GetSelfUserById 查询用户自身的资料（附带是否已设置密码标记），供个人中心与安全设置页使用。
+func GetSelfUserById(id int) (*User, error) {
+	if id == 0 {
+		return nil, errors.New("id 为空！")
+	}
+	var profile struct {
+		User
+		HasPassword bool `gorm:"column:has_password"`
+	}
+	err := DB.Model(&User{}).Select([]string{
+		"id", "username", "display_name", "role", "status", "email",
+		"github_id", "discord_id", "oidc_id", "wechat_id", "telegram_id",
+		"group", "quota", "used_quota", "request_count", "aff_code", "aff_count",
+		"aff_quota", "aff_history", "inviter_id", "linux_do_id", "setting",
+		"stripe_customer", "auth_version",
+		"CASE WHEN password <> '' THEN 1 ELSE 0 END AS has_password",
+	}).First(&profile, "id = ?", id).Error
+	profile.User.HasPassword = profile.HasPassword
+	return &profile.User, err
+}
+
+// DeleteUserForSession 在校验会话仍然有效后删除该用户，并使其全部会话与缓存失效。
+func DeleteUserForSession(identity AuthSessionIdentity) error {
+	user := User{Id: identity.UserID}
+	return user.delete(&identity)
+}
+
+// delete 在事务内删除用户：校验会话、禁止删除 root、递增鉴权版本并删除记录，
+// 提交后再发布鉴权版本、撤销全部会话并清理用户缓存。
+func (user *User) delete(identity *AuthSessionIdentity) error {
+	if user.Id == 0 {
+		return errors.New("id 为空！")
+	}
+	var nextAuthVersion int64
+	if err := DB.Transaction(func(tx *gorm.DB) error {
+		if identity != nil {
+			if err := ValidateAuthSessionWithTx(tx, *identity); err != nil {
+				return err
+			}
+			var role int
+			if err := tx.Model(&User{}).Where("id = ?", user.Id).Select("role").Scan(&role).Error; err != nil {
+				return err
+			}
+			if role == common.RoleRootUser {
+				return ErrCannotDeleteRootUser
+			}
+		}
+		var err error
+		nextAuthVersion, err = IncrementUserAuthVersionWithTx(tx, user.Id)
+		if err != nil {
+			return err
+		}
+		return tx.Delete(user).Error
+	}); err != nil {
+		return err
+	}
+	if err := publishCommittedUserAuthVersion(user.Id, nextAuthVersion); err != nil {
+		return err
+	}
+	if _, err := RevokeAllUserSessions(user.Id, "user_deleted"); err != nil {
+		return err
+	}
+	return invalidateUserCache(user.Id)
 }
 
 func GetMaxUserId() int {

@@ -696,14 +696,9 @@ export function ChannelMutateDrawer({
   const { copyToClipboard } = useCopyToClipboard()
 
   const {
-    open: verificationOpen,
-    methods: verificationMethods,
-    state: verificationState,
-    executeVerification,
-    withVerification,
-    cancel: cancelVerification,
-    setCode: setVerificationCode,
-    switchMethod: switchVerificationMethod,
+    requestVerification,
+    isActive: verificationActive,
+    dialogProps: verificationDialogProps,
   } = useSecureVerification()
 
   useEffect(() => {
@@ -1400,20 +1395,22 @@ export function ChannelMutateDrawer({
     if (!channelId) return
 
     try {
-      await withVerification(fetchChannelKey, {
+      const proof = await requestVerification({
         scope: 'channel.key.read',
-        preferredMethod: 'passkey',
+        context: { channel_id: channelId },
         title: t('Verify to view channel key'),
         description: t(
           'Use Passkey or 2FA to confirm your identity before revealing this channel key.'
         ),
       })
+      if (!proof) return
+      await fetchChannelKey(proof.proof_token)
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
       }
     }
-  }, [channelId, withVerification, fetchChannelKey, t])
+  }, [channelId, requestVerification, fetchChannelKey, t])
 
   const handleRefreshCodexCredential = useCallback(async () => {
     if (!channelId) return
@@ -3132,11 +3129,11 @@ export function ChannelMutateDrawer({
                                                 onClick={handleRevealKey}
                                                 disabled={
                                                   isChannelKeyLoading ||
-                                                  verificationState.loading
+                                                  verificationActive
                                                 }
                                               >
                                                 {isChannelKeyLoading ||
-                                                verificationState.loading ? (
+                                                verificationActive ? (
                                                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                                                 ) : (
                                                   <Eye className='mr-2 h-4 w-4' />
@@ -4973,22 +4970,7 @@ export function ChannelMutateDrawer({
         existingModelsOverride={currentModelsArray}
       />
 
-      <SecureVerificationDialog
-        open={verificationOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            cancelVerification()
-          }
-        }}
-        methods={verificationMethods}
-        state={verificationState}
-        onVerify={async (method, code) => {
-          await executeVerification(method, code)
-        }}
-        onCancel={cancelVerification}
-        onCodeChange={setVerificationCode}
-        onMethodChange={switchVerificationMethod}
-      />
+      <SecureVerificationDialog {...verificationDialogProps} />
 
       {/* Missing Models Confirmation Dialog */}
       <MissingModelsConfirmationDialog

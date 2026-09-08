@@ -22,7 +22,7 @@ import { toast } from 'sonner'
 
 import { clearAuthentication, isAuthBundle } from '@/lib/api'
 
-import { createOAuthFlow, logout, telegramLogin } from '../api'
+import { createOAuthAuthorization, logout, telegramLogin } from '../api'
 import {
   buildGitHubOAuthUrl,
   buildDiscordOAuthUrl,
@@ -91,7 +91,7 @@ export function useOAuthLogin(
 
     try {
       await resetSession()
-      const state = await createOAuthFlow('github', 'login', getRegistrationCode?.())
+      const { state } = await createOAuthAuthorization('github', 'login', undefined, undefined, undefined, getRegistrationCode?.())
 
       const url = buildGitHubOAuthUrl(status.github_client_id, state)
       window.open(url, '_self')
@@ -112,7 +112,7 @@ export function useOAuthLogin(
     setIsLoading(true)
     try {
       await resetSession()
-      const state = await createOAuthFlow('discord', 'login', getRegistrationCode?.())
+      const { state } = await createOAuthAuthorization('discord', 'login', undefined, undefined, undefined, getRegistrationCode?.())
 
       const url = buildDiscordOAuthUrl(status.discord_client_id, state)
       window.open(url, '_self')
@@ -129,7 +129,7 @@ export function useOAuthLogin(
     setIsLoading(true)
     try {
       await resetSession()
-      const state = await createOAuthFlow('oidc', 'login', getRegistrationCode?.())
+      const { state } = await createOAuthAuthorization('oidc', 'login', undefined, undefined, undefined, getRegistrationCode?.())
 
       const url = buildOIDCOAuthUrl(
         status.oidc_authorization_endpoint,
@@ -150,7 +150,7 @@ export function useOAuthLogin(
     setIsLoading(true)
     try {
       await resetSession()
-      const state = await createOAuthFlow('linuxdo', 'login', getRegistrationCode?.())
+      const { state } = await createOAuthAuthorization('linuxdo', 'login', undefined, undefined, undefined, getRegistrationCode?.())
 
       const url = buildLinuxDOOAuthUrl(status.linuxdo_client_id, state)
       window.open(url, '_self')
@@ -211,7 +211,7 @@ export function useOAuthLogin(
     setIsLoading(true)
     try {
       await resetSession()
-      const state = await createOAuthFlow(provider.slug, 'login', getRegistrationCode?.())
+      const { state } = await createOAuthAuthorization(provider.slug, 'login', undefined, undefined, undefined, getRegistrationCode?.())
 
       const redirectUri = `${window.location.origin}/oauth/${provider.slug}`
       const url = new URL(provider.authorization_endpoint)

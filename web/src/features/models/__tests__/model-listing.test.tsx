@@ -48,7 +48,6 @@ import type {
 import { pricingOptions } from '@/features/model-pricing/pricing'
 import { usePricingColumns } from '@/features/pricing/components/pricing-columns'
 import type { PricingModel } from '@/features/pricing/types'
-import fr from '@/i18n/locales/fr.json'
 import zhCN from '@/i18n/locales/zh.json'
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth-store'
@@ -195,7 +194,6 @@ beforeEach(() => {
     currency: { ...DEFAULT_CURRENCY_CONFIG, quotaDisplayType: 'USD' },
   })
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
-  i18n.addResourceBundle('fr', 'translation', fr.translation, true, true)
   i18n.addResourceBundle('zhCN', 'translation', zhCN.translation, true, true)
 })
 
@@ -308,7 +306,7 @@ it('keeps long model names and translated channel labels truncated inside their 
   expect(screen.getByText(longName)).toHaveClass('truncate')
   expect(screen.getByText('Add metadata')).toHaveClass('truncate')
   await act(async () => {
-    await i18n.changeLanguage('fr')
+    await i18n.changeLanguage('zhCN')
   })
   const label = screen.getAllByText(
     i18n.t('Channels {{channels}} · Groups {{groups}}', {
@@ -516,7 +514,7 @@ it('opens a long translated reason by touch in the mobile card without requiring
   }))
   await renderList([metadata])
   await act(async () => {
-    await i18n.changeLanguage('fr')
+    await i18n.changeLanguage('zhCN')
   })
   const user = userEvent.setup()
   const trigger = screen.getByRole('button', {

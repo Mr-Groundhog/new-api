@@ -75,4 +75,9 @@ const (
 	// fallback in authHelper (finishAdminAudit) skips its record to avoid
 	// duplicate entries.
 	ContextKeyAuditLogged ContextKey = "audit_logged"
+
+	// ContextKeyTokenAuditParams 暂存待写入审计日志的令牌操作参数，由审计中间件在请求结束时读取。
+	ContextKeyTokenAuditParams ContextKey = "token_audit_params"
+	// ContextKeyTokenAuditSucceeded 记录令牌操作是否成功，供请求结束时的审计兜底逻辑使用。
+	ContextKeyTokenAuditSucceeded ContextKey = "token_audit_succeeded"
 )
