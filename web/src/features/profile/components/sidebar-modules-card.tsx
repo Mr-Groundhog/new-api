@@ -94,6 +94,11 @@ export function SidebarModulesCard() {
           description: t('API usage records'),
         },
         {
+          key: 'audit',
+          title: t('Audit Logs'),
+          description: t('Login, security and access records'),
+        },
+        {
           key: 'midjourney',
           title: t('Drawing Logs'),
           description: t('Drawing task records'),
@@ -121,14 +126,9 @@ export function SidebarModulesCard() {
           description: t('Personal info settings'),
         },
         {
-          key: 'welfareAirdrop',
-          title: t('Welfare Airdrop'),
-          description: t('Limited-time credit giveaways'),
-        },
-        {
-          key: 'ticket',
-          title: t('Ticket Feedback'),
-          description: t('Submit tickets and view admin replies'),
+          key: 'security',
+          title: t('Security & Access'),
+          description: t('Manage your security settings and account access'),
         },
       ],
     },

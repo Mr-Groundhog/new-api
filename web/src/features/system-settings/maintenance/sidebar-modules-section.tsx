@@ -110,6 +110,10 @@ export function SidebarModulesSection({
         title: t('Usage logs'),
         description: t('Detailed request logs for investigations.'),
       },
+      audit: {
+        title: t('Audit Logs'),
+        description: t('Login, security and access records'),
+      },
       midjourney: {
         title: t('Drawing logs'),
         description: t('History of MjProxy-style image tasks.'),
@@ -128,13 +132,9 @@ export function SidebarModulesSection({
         title: t('Profile'),
         description: t('Personal settings and profile management.'),
       },
-      welfareAirdrop: {
-        title: t('Welfare Airdrop'),
-        description: t('Limited-time credit giveaways users can claim.'),
-      },
-      ticket: {
-        title: t('Ticket Feedback'),
-        description: t('User support tickets and admin replies.'),
+      security: {
+        title: t('Security & Access'),
+        description: t('Manage your security settings and account access'),
       },
     },
     admin: {
@@ -150,21 +150,9 @@ export function SidebarModulesSection({
         title: t('Redeem codes'),
         description: t('Create and review invite or credit codes.'),
       },
-      ticket: {
-        title: t('Ticket Management'),
-        description: t('Review and reply to user support tickets.'),
-      },
       user: {
         title: t('Users'),
         description: t('Administer user accounts and roles.'),
-      },
-      sensitiveWordTriggers: {
-        title: t('Risk Control Center'),
-        description: t('Review blocked requests and repeated violations.'),
-      },
-      userRankings: {
-        title: t('User Rankings'),
-        description: t('Compare user IP activity and API call volume.'),
       },
       setting: {
         title: t('System settings'),
