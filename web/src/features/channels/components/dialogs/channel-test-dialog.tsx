@@ -60,6 +60,7 @@ import {
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -86,6 +87,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { handleServerError } from '@/lib/handle-server-error'
 
 import { updateChannel } from '../../api'
 import {
@@ -806,14 +808,10 @@ function ChannelTestDialogContent({
         refreshChannelLists()
         setIsDeleteFailedDialogOpen(false)
       } else {
-        toast.error(response.message || t('Failed to delete failed models'))
+        handleServerError(response, t('Failed to delete failed models'))
       }
     } catch (error: unknown) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : t('Failed to delete failed models')
-      )
+      handleServerError(error, t('Failed to delete failed models'))
     } finally {
       setIsDeletingFailed(false)
     }

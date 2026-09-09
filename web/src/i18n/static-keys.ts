@@ -19,6 +19,71 @@ For commercial licensing, please contact support@quantumnous.com
 // Static translation keys that don't get picked up by the t('...') regex.
 // These cover dynamic labels (e.g. constants, configs) that are passed into t at runtime.
 export const STATIC_I18N_KEYS = [
+  // Billing expression simulation diagnostics and conditional labels.
+  '{{start}}–{{end}}',
+
+  // Billing expression simulation diagnostics and conditional labels.
+  'Outside these times: {{condition}}',
+  '{{first}} and {{second}}',
+  '{{first}} or {{second}}',
+  '{{condition}} ({{timezone}})',
+
+  // Billing expression simulation diagnostics and conditional labels.
+  'Current period price',
+  'Add at least one condition to this group.',
+  'Choose a valid IANA timezone.',
+  'Enter a finite, non-negative price.',
+  'Enter a valid condition value.',
+  'Include at least one price variable.',
+  'Request simulation',
+  'Simulated request body',
+  'Simulated request headers',
+  'Simulation time',
+  'Current time',
+  'Specified time',
+  'Simulated request cost',
+  'Simulate a request including request rules and excluding group multipliers. Empty objects represent an empty request.',
+  'Time functions use the timezone written in the expression.',
+  'Request body must be a JSON object.',
+  'Request headers must be a JSON object with string values.',
+  'Enter an ISO date and time with a timezone offset.',
+  'Invalid expression syntax',
+  'This expression cannot be simulated in the browser.',
+  'Simulation context is missing.',
+  'Expression argument types do not match.',
+  'Billing values must be finite and non-negative.',
+  'This expression exceeds the browser simulation limits.',
+  'Full input length override',
+  'Use the existing token total',
+  'This expression cannot be edited visually without losing information.',
+  'Matched',
+  'Not matched',
+
+  'Account deletion',
+  // Model management and metadata synchronization
+  'No matching channels',
+  'Metadata only',
+  'Available channels: {{count}}',
+  'No configured channel models match this metadata rule.',
+  'No channel is configured. This model will not appear in the model square.',
+  'No channel is currently available. This model will not appear in the model square.',
+  'Listing also depends on metadata visibility and the user’s group access.',
+  'Add metadata to all selected models first.',
+
+  'Model management',
+  'Select models',
+  'Preview fields',
+  'Confirm changes',
+  'Sync results',
+  'New metadata',
+  'Metadata changes',
+  'No changes',
+  'Metadata sync disabled',
+  'Not found upstream',
+  'Upstream vendor missing',
+  'Custom endpoints',
+  'Catalog visibility',
+
   // Header navigation
   'Home',
   'Console',

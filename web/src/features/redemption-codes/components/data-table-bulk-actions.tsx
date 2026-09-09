@@ -32,6 +32,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { handleServerError } from '@/lib/handle-server-error'
+import { createServerError } from '@/lib/server-error-message'
 
 import {
   batchDeleteRedemptions,
@@ -118,7 +120,7 @@ export function DataTableBulkActions(props: DataTableBulkActionsProps) {
       const result = await batchDeleteRedemptions(
         targets.map((code) => code.id)
       )
-      if (!result.success) throw new Error(result.message)
+      if (!result.success) throw createServerError(result)
       return result.data ?? 0
     },
     onSuccess: (count, targets) => {
@@ -134,7 +136,8 @@ export function DataTableBulkActions(props: DataTableBulkActionsProps) {
       triggerRefresh()
     },
     onError: (_error, targets) => {
-      toast.error(
+      handleServerError(
+        _error,
         t('Failed to delete {{count}} redemption codes', {
           count: targets.length,
         })

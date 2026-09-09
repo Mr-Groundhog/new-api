@@ -26,7 +26,11 @@ import {
   getFreshAuthHeaders,
   refreshAuthentication,
 } from '@/lib/auth-session'
-import { getServerErrorMessageKey } from '@/lib/server-error-message'
+import { markServerErrorHandled } from '@/lib/handle-server-error'
+import {
+  getServerErrorMessage,
+  getServerErrorMessageKey,
+} from '@/lib/server-error-message'
 import { useAuthStore } from '@/stores/auth-store'
 
 declare module 'axios' {
@@ -105,6 +109,7 @@ api.interceptors.response.use(
           ? t(messageKey)
           : response.data.message || t('Request failed')
       )
+      markServerErrorHandled(response.data)
     }
     return response
   },
@@ -131,14 +136,17 @@ api.interceptors.response.use(
 
         if (outcome.kind === 'anonymous' || outcome.kind === 'out_of_sync') {
           notifySessionExpired(skipErrorHandler)
+          markServerErrorHandled(error)
           redirectToSignIn()
         }
       } else if (config?.authRetry) {
         clearAuthentication(false)
         notifySessionExpired(skipErrorHandler)
+        markServerErrorHandled(error)
         redirectToSignIn()
       } else {
         notifySessionExpired(skipErrorHandler)
+        markServerErrorHandled(error)
       }
     } else if (!skipErrorHandler) {
       const messageKey = getServerErrorMessageKey(error)
@@ -148,7 +156,9 @@ api.interceptors.response.use(
           error?.message ||
           t('Request failed')
       toast.error(message)
+      markServerErrorHandled(error)
     }
+    if (axios.isAxiosError(error)) error.message = getServerErrorMessage(error)
     throw error
   }
 )
