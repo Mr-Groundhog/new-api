@@ -22,8 +22,28 @@ import { Dialog } from '@/components/dialog'
 import { useStatus } from '@/hooks/use-status'
 import type { BroadcastItem } from '@/features/dashboard/types'
 import type { SystemStatus } from '@/features/auth/types'
+import dayjs from '@/lib/dayjs'
 
-import { Radio, X } from 'lucide-react'
+import { CalendarCheck, Radio, X } from 'lucide-react'
+
+// localStorage key for the "Close Today" date (YYYY-MM-DD); stored per browser.
+const DISMISSED_TODAY_KEY = 'global_broadcast_dismissed_date'
+
+// Session-level flag: after a plain close the popup stays suppressed for the
+// current window session only; reopening the browser re-enables auto-open.
+let suppressedInSession = false
+
+function isDismissedToday(): boolean {
+  try {
+    if (typeof window === 'undefined') return true
+    return (
+      window.localStorage.getItem(DISMISSED_TODAY_KEY) ===
+      dayjs().format('YYYY-MM-DD')
+    )
+  } catch {
+    return false
+  }
+}
 
 const badgeVariantMap = {
   default: 'neutral',
@@ -140,6 +160,35 @@ export function GlobalBroadcast() {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // Auto-open the dialog on the first entry of each day, unless the user
+  // clicked "Close Today" (persisted) or plain-closed it in this window.
+  useEffect(() => {
+    if (broadcasts.length === 0) return
+    if (suppressedInSession || isDismissedToday()) return
+    setOpen(true)
+  }, [broadcasts.length])
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      // Plain close: suppress auto-open for the current window session only.
+      suppressedInSession = true
+    }
+    setOpen(next)
+  }
+
+  const closeForToday = () => {
+    try {
+      window.localStorage.setItem(
+        DISMISSED_TODAY_KEY,
+        dayjs().format('YYYY-MM-DD')
+      )
+    } catch {
+      // Storage unavailable: fall back to closing for this session only.
+    }
+    suppressedInSession = true
+    setOpen(false)
+  }
+
   // Reset/advance the carousel only when there is more than one broadcast.
   useEffect(() => {
     if (broadcasts.length <= 1) {
@@ -172,21 +221,31 @@ export function GlobalBroadcast() {
 
       <Dialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={handleOpenChange}
         title={t('Global Broadcast')}
         description={t('Latest broadcasts from the platform')}
         contentClassName='max-w-lg'
         contentHeight='auto'
         bodyClassName='space-y-3'
         footer={
-          <button
-            type='button'
-            onClick={() => setOpen(false)}
-            className='inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90'
-          >
-            <X className='h-4 w-4' />
-            {t('Close')}
-          </button>
+          <div className='flex justify-end gap-2'>
+            <button
+              type='button'
+              onClick={closeForToday}
+              className='inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted'
+            >
+              <CalendarCheck className='h-4 w-4' />
+              {t('Close Today')}
+            </button>
+            <button
+              type='button'
+              onClick={() => handleOpenChange(false)}
+              className='inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90'
+            >
+              <X className='h-4 w-4' />
+              {t('Close')}
+            </button>
+          </div>
         }
       >
         {broadcasts.map((b, i) => (

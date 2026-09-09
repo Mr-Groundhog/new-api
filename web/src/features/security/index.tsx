@@ -37,7 +37,6 @@ import { AccountActionCard } from './components/account-action-card'
 import { AccountBindings } from './components/account-bindings'
 import { LoginSessionsCard } from './components/login-sessions-card'
 import { PasskeyCard } from './components/passkey-card'
-import { PrivacyCard } from './components/privacy-card'
 import { TwoFACard } from './components/two-fa-card'
 
 export function Security() {
@@ -125,12 +124,6 @@ export function Security() {
             <PasskeyCard loading={loading} />
             <TwoFACard loading={loading} />
           </div>
-          <section aria-labelledby='security-privacy' className='space-y-4'>
-            <h3 id='security-privacy' className='text-sm font-semibold'>
-              {t('Privacy')}
-            </h3>
-            <PrivacyCard profile={profile} onUpdate={refreshProfile} />
-          </section>
         </aside>
       </div>
     )
