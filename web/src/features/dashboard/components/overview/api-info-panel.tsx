@@ -62,6 +62,7 @@ export function ApiInfoPanel() {
       empty={!list.length}
       emptyMessage={t('No API routes configured')}
       height='h-72'
+      className='flex h-full flex-col'
       contentClassName='p-0'
     >
       <ScrollArea className='h-72'>

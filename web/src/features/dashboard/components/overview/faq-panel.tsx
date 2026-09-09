@@ -52,6 +52,7 @@ export function FAQPanel() {
       empty={!list.length}
       emptyMessage={t('No FAQ entries available')}
       height='h-80'
+      className='flex h-full flex-col'
       contentClassName='p-0'
     >
       <ScrollArea className='h-80'>

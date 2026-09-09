@@ -23,6 +23,7 @@ import { useStatus } from '@/hooks/use-status'
 import type { BroadcastItem } from '@/features/dashboard/types'
 import type { SystemStatus } from '@/features/auth/types'
 import dayjs from '@/lib/dayjs'
+import { cn } from '@/lib/utils'
 
 import { CalendarCheck, Radio, X } from 'lucide-react'
 
@@ -143,6 +144,15 @@ function BroadcastLine({
   )
 }
 
+type GlobalBroadcastProps = {
+  /**
+   * Below the md breakpoint, collapse the marquee into an icon-only button
+   * that opens the broadcast list dialog (for the cramped top app bar on
+   * mobile). The full marquee is unaffected.
+   */
+  iconOnlyOnMobile?: boolean
+}
+
 /**
  * Global broadcast widget placed next to the logo in the header.
  *
@@ -152,7 +162,7 @@ function BroadcastLine({
  *
  * Hidden when broadcast_enabled is false or there are no broadcasts.
  */
-export function GlobalBroadcast() {
+export function GlobalBroadcast(props: GlobalBroadcastProps) {
   const { t } = useTranslation()
   // Keep the cache warm / refresh localStorage in the background.
   useStatus()
@@ -208,7 +218,23 @@ export function GlobalBroadcast() {
 
   return (
     <>
-      <div className='min-w-[160px] flex-1 rounded-full bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 p-[2px] shadow-sm transition hover:shadow-[0_0_10px_rgba(239,68,68,0.4)] dark:from-red-500 dark:via-orange-500 dark:to-yellow-500'>
+      {props.iconOnlyOnMobile ? (
+        <button
+          type='button'
+          aria-label={t('Global Broadcast')}
+          onClick={() => setOpen(true)}
+          className='flex size-8 shrink-0 items-center justify-center rounded-full text-amber-600 transition hover:bg-accent md:hidden dark:text-amber-400'
+        >
+          <Radio className='h-4 w-4 animate-pulse' />
+        </button>
+      ) : null}
+
+      <div
+        className={cn(
+          'min-w-[160px] flex-1 rounded-full bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 p-[2px] shadow-sm transition hover:shadow-[0_0_10px_rgba(239,68,68,0.4)] dark:from-red-500 dark:via-orange-500 dark:to-yellow-500',
+          props.iconOnlyOnMobile && 'hidden md:block'
+        )}
+      >
         <div className='flex h-7 w-full items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-amber-50 to-orange-50 px-3 transition hover:from-amber-100 hover:to-orange-100 dark:from-amber-500/10 dark:to-orange-500/10 dark:hover:from-amber-500/20 dark:hover:to-orange-500/20'>
           <span className='flex shrink-0 items-center gap-1.5 text-amber-600 dark:text-amber-400'>
             <Radio className='h-4 w-4 animate-pulse' />
@@ -235,7 +261,7 @@ export function GlobalBroadcast() {
               className='inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted'
             >
               <CalendarCheck className='h-4 w-4' />
-              {t('Close Today')}
+              {t('Dismiss for Today')}
             </button>
             <button
               type='button'
@@ -243,7 +269,7 @@ export function GlobalBroadcast() {
               className='inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90'
             >
               <X className='h-4 w-4' />
-              {t('Close')}
+              {t('I Acknowledge')}
             </button>
           </div>
         }

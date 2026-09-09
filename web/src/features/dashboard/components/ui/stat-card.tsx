@@ -52,6 +52,7 @@ interface StatCardProps {
   action?: ReactNode
   iconTone?: IconBadgeTone
   compactMobile?: boolean
+  className?: string
 }
 
 const TONE_CLASSES: Record<StatCardTone, string> = {
@@ -300,8 +301,9 @@ export function StatCard(props: StatCardProps) {
   return (
     <div
       className={cn(
-        'group flex flex-col justify-between sm:min-h-32 sm:gap-3',
-        props.compactMobile ? 'gap-1' : 'gap-1.5'
+        'group flex h-full flex-col justify-between sm:min-h-32 sm:gap-3',
+        props.compactMobile ? 'gap-1' : 'gap-1.5',
+        props.className
       )}
     >
       <div className='flex items-start justify-between gap-1'>

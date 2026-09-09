@@ -80,7 +80,7 @@ export function OverviewDashboard() {
                 </CardStaggerItem>
               )}
               {showFAQPanel && (
-                <CardStaggerItem>
+                <CardStaggerItem className='lg:col-span-2'>
                   <FAQPanel />
                 </CardStaggerItem>
               )}

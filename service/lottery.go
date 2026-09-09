@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 )
 
@@ -127,11 +126,6 @@ func DrawLottery(userId int, username string, now time.Time) (*LotteryDrawResult
 	}
 	if err := model.CreateLotteryDrawRecordTx(userId, drawDay, record, selected.QuotaAmount); err != nil {
 		return nil, err
-	}
-
-	if selected.QuotaAmount > 0 {
-		model.RecordLog(userId, model.LogTypeTopup, fmt.Sprintf(
-			"通过浮梦引光获得额度: %v", logger.LogQuota(selected.QuotaAmount)))
 	}
 
 	return &LotteryDrawResult{

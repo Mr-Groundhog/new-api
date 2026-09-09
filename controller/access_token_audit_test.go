@@ -366,6 +366,40 @@ func TestSecurityAndOperationEventsUseAuditTable(t *testing.T) {
 	assert.EqualValues(t, 10, count)
 }
 
+func TestLotteryDrawWritesAuditLogInsteadOfUsageLog(t *testing.T) {
+	user, _ := setupAccessTokenAudit(t)
+	require.NoError(t, model.DB.AutoMigrate(&model.LotteryPrize{}, &model.LotteryDrawRecord{}))
+	prize := model.LotteryPrize{
+		Code: "lucky", Name: "Lucky Drop", Label: "$1 credit", Icon: "1", Tone: "gold",
+		Weight: 1, QuotaAmount: 500000, SortOrder: 1, Active: true,
+	}
+	require.NoError(t, model.DB.Create(&prize).Error)
+
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request = httptest.NewRequest("POST", "/api/lottery/draw", nil)
+	c.Set("id", user.Id)
+	c.Set("username", user.Username)
+	c.Set("role", user.Role)
+	DrawLottery(c)
+
+	var audits []model.AuditLog
+	require.NoError(t, model.LOG_DB.Find(&audits).Error)
+	require.Len(t, audits, 1)
+	assert.Equal(t, "lottery.draw", audits[0].Action)
+	assert.Equal(t, model.AuditCategoryOperation, audits[0].Category)
+	assert.Equal(t, user.Id, audits[0].UserId)
+	require.NotNil(t, audits[0].Other.Op)
+	paramsJSON, err := common.Marshal(audits[0].Other.Op.Params)
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"prize":"Lucky Drop","quota":500000}`, string(paramsJSON))
+
+	// The prize win used to be written as a LogTypeTopup usage log; it must now
+	// live exclusively in the audit trail.
+	var logs []model.Log
+	require.NoError(t, model.LOG_DB.Find(&logs).Error)
+	assert.Empty(t, logs)
+}
+
 // Released schemas copied from v1.0.0-rc.33; only the Go type names differ.
 
 type releasedAuditUser struct {

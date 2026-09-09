@@ -77,8 +77,8 @@ export function SystemBrand(props: SystemBrandProps) {
           <span className='max-w-[12rem] truncate'>{name}</span>
         </Link>
         <div className='flex min-w-0 flex-1 items-center'>
-          <div className='ms-[6%] w-2/5'>
-            <GlobalBroadcast />
+          <div className='ms-[6%] w-[70%] max-md:w-auto'>
+            <GlobalBroadcast iconOnlyOnMobile />
           </div>
         </div>
       </div>

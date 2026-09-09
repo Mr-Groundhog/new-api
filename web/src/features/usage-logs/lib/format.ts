@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { StatusBadgeProps } from '@/components/status-badge'
+import { formatLogQuota } from '@/lib/format'
 import {
   BILLING_PRICING_VARS,
   normalizeTierLabel,
@@ -495,6 +496,8 @@ const AUDIT_TEMPLATES: Record<string, string> = {
   // Logs
   'log.clear': 'Cleared historical logs',
   'log.cleanup_start': 'Log cleanup task started.',
+  // Lottery
+  'lottery.draw': 'Won the lottery prize “{{prize}}” (+{{quota}})',
   // Generic middleware fallback
   generic: '{{method}} {{route}}',
 }
@@ -540,5 +543,12 @@ export function renderAuditContent(
     return `${quotaOperation.summary} · ${quotaOperation.description}`
   }
   const params = { ...op.params }
+  if (
+    op.action === 'lottery.draw' &&
+    typeof params.quota === 'number' &&
+    Number.isFinite(params.quota)
+  ) {
+    params.quota = formatLogQuota(params.quota)
+  }
   return t(template, params)
 }
