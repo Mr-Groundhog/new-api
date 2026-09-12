@@ -393,6 +393,7 @@ func migrateDB() error {
 		&WelfareAirdropClaim{},
 		&Ticket{},
 		&TicketMessage{},
+		&TokenRiskEvent{},
 	)
 	if err != nil {
 		return err
@@ -469,6 +470,7 @@ func migrateDBFast() error {
 		{&WelfareAirdropClaim{}, "WelfareAirdropClaim"},
 		{&Ticket{}, "Ticket"},
 		{&TicketMessage{}, "TicketMessage"},
+		{&TokenRiskEvent{}, "TokenRiskEvent"},
 	}
 	// 动态计算migration数量，确保errChan缓冲区足够大
 	errChan := make(chan error, len(migrations))

@@ -21,6 +21,8 @@ const (
 	SystemTaskTypeModelUpdate    = "model_update"
 	SystemTaskTypeMidjourneyPoll = "midjourney_poll"
 	SystemTaskTypeAsyncTaskPoll  = "async_task_poll"
+	// SystemTaskTypeRiskScan 是令牌分发风控的每日聚类扫描任务。
+	SystemTaskTypeRiskScan = "risk_scan"
 )
 
 var ErrSystemTaskLockLost = errors.New("system task lock lost")

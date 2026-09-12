@@ -160,9 +160,12 @@ type RelayInfo struct {
 	IsChannelTest                         bool // channel test request
 	RetryIndex                            int
 	LastError                             *types.NewAPIError
-	RuntimeHeadersOverride                map[string]any
-	UseRuntimeHeadersOverride             bool
-	ParamOverrideAudit                    []string
+	// ClientFingerprint 是风控中间件计算的客户端指纹（16 位十六进制），
+	// 空串表示该请求未参与风控。仅写入日志 admin_info，不下发给用户。
+	ClientFingerprint         string
+	RuntimeHeadersOverride    map[string]any
+	UseRuntimeHeadersOverride bool
+	ParamOverrideAudit        []string
 
 	PriceData hosttypes.PriceData
 
@@ -555,6 +558,8 @@ func genBaseRelayInfo(c *gin.Context, request dto.Request) *RelayInfo {
 		TokenKey:       common.GetContextKeyString(c, constant.ContextKeyTokenKey),
 		TokenUnlimited: common.GetContextKeyBool(c, constant.ContextKeyTokenUnlimited),
 		TokenGroup:     tokenGroup,
+
+		ClientFingerprint: common.GetContextKeyString(c, constant.ContextKeyClientFingerprint),
 
 		isFirstResponse: true,
 		RelayMode:       relayconstant.Path2RelayMode(c.Request.URL.Path),

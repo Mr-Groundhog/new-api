@@ -58,7 +58,6 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group";
 import {
-  formatQuotaWithCurrency,
   getCurrencyDisplay,
   getCurrencyLabel,
 } from "@/lib/currency";
@@ -85,10 +84,6 @@ import {
 import { createRegistrationCode } from "@/features/registration-codes/api";
 import { SUCCESS_MESSAGES as REGISTRATION_SUCCESS_MESSAGES } from "@/features/registration-codes/constants";
 import type { Redemption } from "../types";
-import {
-  RedemptionsExportDialog,
-  type RedemptionExportData,
-} from "./redemptions-export-dialog";
 import { useRedemptions } from "./redemptions-provider";
 
 type RedemptionsMutateDrawerProps = {
@@ -108,9 +103,6 @@ export function RedemptionsMutateDrawer({
   const { triggerRefresh, createType, setCreateType } = useRedemptions();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdCodes, setCreatedCodes] = useState<RedemptionExportData | null>(
-    null,
-  );
   const [redemptionLoadState, setRedemptionLoadState] = useState<
     "idle" | "loading" | "ready" | "error"
   >("idle");
@@ -243,15 +235,6 @@ export function RedemptionsMutateDrawer({
                 })
               : t(SUCCESS_MESSAGES.REDEMPTION_CREATED),
           );
-          if (result.data?.length) {
-            setCreatedCodes({
-              keys: result.data,
-              name: basePayload.name,
-              quota: formatQuotaWithCurrency(basePayload.quota, {
-                abbreviate: false,
-              }),
-            });
-          }
           onOpenChange(false);
           triggerRefresh();
         } else {
@@ -692,12 +675,6 @@ export function RedemptionsMutateDrawer({
           </SheetFooter>
         </SheetContent>
       </Sheet>
-      {createdCodes && (
-        <RedemptionsExportDialog
-          data={createdCodes}
-          onClose={() => setCreatedCodes(null)}
-        />
-      )}
     </>
   );
 }

@@ -27,6 +27,8 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, expect, test, vi } from 'vitest'
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 import { api } from '@/lib/api'
 import {
   DEFAULT_CURRENCY_CONFIG,
@@ -74,9 +76,15 @@ function readDownload(download: Download): Promise<string> {
 function CreateDrawer() {
   const [open, setOpen] = useState(true)
   return (
-    <RedemptionsProvider>
-      <RedemptionsMutateDrawer open={open} onOpenChange={setOpen} />
-    </RedemptionsProvider>
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      <RedemptionsProvider>
+        <RedemptionsMutateDrawer open={open} onOpenChange={setOpen} />
+      </RedemptionsProvider>
+    </QueryClientProvider>
   )
 }
 
@@ -178,9 +186,7 @@ test('keeps names containing table delimiters and markup inside one Markdown cel
   )
 })
 
-test('successful batch creation opens export with returned codes and the configured currency', async () => {
-  const downloads = captureDownloads()
-  const user = userEvent.setup()
+test('successful batch creation closes the drawer without opening an export dialog', async () => {
   useSystemConfigStore.getState().setConfig({
     currency: {
       ...DEFAULT_CURRENCY_CONFIG,
@@ -204,36 +210,19 @@ test('successful batch creation opens export with returned codes and the configu
   fireEvent.change(within(createDialog).getByLabelText('Quota (CNY)'), {
     target: { value: '2000' },
   })
-  await user.click(
-    within(createDialog).getByRole('button', { name: 'Save changes' })
-  )
-  const exportDialog = await screen.findByRole('dialog', {
-    name: 'Redemption codes created',
-  })
-  expect(exportDialog).toHaveTextContent(
-    'Successfully created 2 redemption codes'
-  )
+  await userEvent
+    .setup()
+    .click(
+      within(createDialog).getByRole('button', { name: 'Save changes' })
+    )
   await waitFor(() =>
     expect(
       screen.queryByRole('dialog', { name: 'Create Redemption Code' })
     ).not.toBeInTheDocument()
   )
-  await user.click(
-    within(exportDialog).getByRole('checkbox', { name: 'Save as a file' })
-  )
-  await user.click(
-    within(exportDialog).getByRole('radio', { name: 'Save as TXT' })
-  )
-  expect(downloads).toHaveLength(0)
-  await user.click(within(exportDialog).getByRole('button', { name: 'Done' }))
-  await waitFor(() =>
-    expect(
-      screen.queryByRole('dialog', { name: 'Redemption codes created' })
-    ).not.toBeInTheDocument()
-  )
-  expect(await readDownload(downloads[0])).toBe(
-    'batch\tcreatedA\t¥2,000\nbatch\tcreatedB\t¥2,000\n'
-  )
+  expect(
+    screen.queryByRole('dialog', { name: 'Redemption codes created' })
+  ).not.toBeInTheDocument()
 })
 
 test('failed creation does not open a success export dialog', async () => {

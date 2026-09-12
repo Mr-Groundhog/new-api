@@ -98,9 +98,9 @@ func resolveUserSortOptions(sortOptions []UserSortOptions) UserSortOptions {
 // User if you add sensitive fields, don't forget to clean them in setupLogin function.
 // Otherwise, the sensitive information will be saved on local storage in plain text!
 type User struct {
-	Id               int    `json:"id"`
-	Username         string `json:"username" gorm:"unique;index" validate:"max=20"`
-	Password         string `json:"password" gorm:"not null;" validate:"min=8,max=20"`
+	Id       int    `json:"id"`
+	Username string `json:"username" gorm:"unique;index" validate:"max=20"`
+	Password string `json:"password" gorm:"not null;" validate:"min=8,max=20"`
 	// HasPassword 仅用于查询结果标记该用户是否已设置密码，不映射到数据库列。
 	HasPassword      bool   `json:"-" gorm:"-:all"`
 	OriginalPassword string `json:"original_password" gorm:"-:all"` // this field is only for Password change verification, don't save it to database!
@@ -124,10 +124,10 @@ type User struct {
 	// AccessTokenCreatedAt 记录访问令牌的创建时间（Unix 秒），令牌轮换后用于判定旧令牌失效。
 	AccessTokenCreatedAt *int64 `json:"-" gorm:"type:bigint;column:access_token_created_at"`
 	Quota                int    `json:"quota" gorm:"type:int;default:0"`
-	UsedQuota        int     `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
-	RequestCount     int     `json:"request_count" gorm:"type:int;default:0;"`               // request number
-	Group            string  `json:"group" gorm:"type:varchar(64);default:'default'"`
-	AffCode          string  `json:"aff_code" gorm:"type:varchar(32);column:aff_code;uniqueIndex"`
+	UsedQuota            int    `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
+	RequestCount         int    `json:"request_count" gorm:"type:int;default:0;"`               // request number
+	Group                string `json:"group" gorm:"type:varchar(64);default:'default'"`
+	AffCode              string `json:"aff_code" gorm:"type:varchar(32);column:aff_code;uniqueIndex"`
 	// RegistrationCode 注册请求中携带的注册码，仅用于注册校验，不保存到数据库。
 	RegistrationCode string         `json:"registration_code" gorm:"-:all"`
 	AffCount         int            `json:"aff_count" gorm:"type:int;default:0;column:aff_count"`

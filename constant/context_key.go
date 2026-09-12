@@ -70,6 +70,10 @@ const (
 	ContextKeyLanguage ContextKey = "language"
 	ContextKeyIsStream ContextKey = "is_stream"
 
+	// ContextKeyClientFingerprint stores the client fingerprint computed by the
+	// risk detection middleware for the current relay request.
+	ContextKeyClientFingerprint ContextKey = "client_fingerprint"
+
 	// ContextKeyAuditLogged marks that the current request has already recorded
 	// a manage/operation audit log inside the handler. When set, the admin-audit
 	// fallback in authHelper (finishAdminAudit) skips its record to avoid

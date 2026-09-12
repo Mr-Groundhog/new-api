@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { ProbeGuardTab } from './components/probe-guard-tab'
 import { SensitiveWordTriggersTab } from './components/sensitive-word-triggers-tab'
+import { TokenRiskTab } from './components/token-risk-tab'
 
 export function RiskControlCenter() {
   const { t } = useTranslation()
@@ -34,12 +35,16 @@ export function RiskControlCenter() {
           <TabsList className='group-data-horizontal/tabs:h-auto max-w-full flex-wrap justify-start'>
             <TabsTrigger value='sensitive-word-triggers'>{t('Sensitive Word Triggers')}</TabsTrigger>
             <TabsTrigger value='liveness-check-list'>{t('Liveness Check List')}</TabsTrigger>
+            <TabsTrigger value='token-distribution'>{t('Suspected Distribution Users')}</TabsTrigger>
           </TabsList>
           <TabsContent className='min-h-0' value='sensitive-word-triggers'>
             <SensitiveWordTriggersTab />
           </TabsContent>
           <TabsContent className='min-h-0' value='liveness-check-list'>
             <ProbeGuardTab />
+          </TabsContent>
+          <TabsContent className='min-h-0' value='token-distribution'>
+            <TokenRiskTab />
           </TabsContent>
         </Tabs>
       </SectionPageLayout.Content>

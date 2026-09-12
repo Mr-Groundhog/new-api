@@ -203,6 +203,17 @@ func SetApiRouter(router *gin.Engine) {
 			probeGuardRoute.POST("/reset-count", controller.ResetProbeGuardCount)
 		}
 
+		tokenRiskRoute := apiRouter.Group("/token-risk")
+		tokenRiskRoute.Use(middleware.AdminAuth())
+		{
+			tokenRiskRoute.GET("/events", controller.GetTokenRiskEvents)
+			tokenRiskRoute.GET("/users", controller.GetTokenRiskUserSummaries)
+			tokenRiskRoute.GET("/badges", controller.GetTokenRiskBadges)
+			tokenRiskRoute.PUT("/events/:id/status", controller.UpdateTokenRiskEventStatus)
+			tokenRiskRoute.POST("/ban", controller.BanTokenRiskUser)
+			tokenRiskRoute.POST("/delete", controller.DeleteTokenRiskEvents)
+		}
+
 		// Subscription billing (plans, purchase, admin management)
 		subscriptionRoute := apiRouter.Group("/subscription")
 		subscriptionRoute.Use(middleware.UserAuth())

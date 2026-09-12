@@ -10,6 +10,7 @@ import (
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
+	"github.com/QuantumNous/new-api/setting/risk_setting"
 )
 
 // RegisterScheduledSystemTasks wires the periodic channel test, upstream model
@@ -22,6 +23,7 @@ func RegisterScheduledSystemTasks() {
 	service.RegisterSystemTaskHandler(modelUpdateHandler{})
 	service.RegisterSystemTaskHandler(midjourneyPollHandler{})
 	service.RegisterSystemTaskHandler(asyncTaskPollHandler{})
+	service.RegisterSystemTaskHandler(riskScanHandler{})
 }
 
 // channelTestHandler runs the scheduled "test all channels" job. Enablement and
@@ -150,6 +152,26 @@ func (asyncTaskPollHandler) NewPayload() any { return nil }
 func (asyncTaskPollHandler) Run(ctx context.Context, task *model.SystemTask, runnerID string) {
 	summary := service.RunTaskPollingOnce(ctx, service.NewSystemTaskProgressReporter(task, runnerID))
 	finishSystemTaskHandler(task, runnerID, model.SystemTaskStatusSucceeded, summary, nil)
+}
+
+// riskScanHandler runs the daily token-sharing risk cluster scan. It only
+// produces observations (fp_burst / fp_cross_user events); no automatic
+// enforcement is applied.
+type riskScanHandler struct{}
+
+func (riskScanHandler) Type() string { return model.SystemTaskTypeRiskScan }
+
+func (riskScanHandler) Enabled() bool {
+	return risk_setting.GetSetting().Enabled && common.RedisEnabled
+}
+
+func (riskScanHandler) Interval() time.Duration { return 24 * time.Hour }
+
+func (riskScanHandler) NewPayload() any { return nil }
+
+func (riskScanHandler) Run(ctx context.Context, task *model.SystemTask, runnerID string) {
+	service.RunRiskDailyScan()
+	finishSystemTaskHandler(task, runnerID, model.SystemTaskStatusSucceeded, nil, nil)
 }
 
 func finishSystemTaskHandler(task *model.SystemTask, runnerID string, status model.SystemTaskStatus, result any, runErr error) {

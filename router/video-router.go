@@ -11,6 +11,7 @@ func SetVideoRouter(router *gin.Engine) {
 	videoSharedRouter := router.Group("/v1")
 	videoSharedRouter.Use(middleware.RouteTag("relay"))
 	videoSharedRouter.Use(middleware.TokenAuth())
+	videoSharedRouter.Use(middleware.ClientFingerprint())
 	videoSharedRouter.Use(middleware.SystemPerformanceCheck())
 	videoSharedRouter.POST(
 		"/video/generations",
