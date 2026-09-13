@@ -133,6 +133,9 @@ func main() {
 	// Subscription quota reset task (daily/weekly/monthly/custom)
 	service.StartSubscriptionQuotaResetTask()
 
+	// GitHub Star 奖励：定时同步目标仓库 Stargazers 到本地缓存表
+	service.StartGithubStarStargazersSyncTask()
+
 	// Report this process as a system instance so the System Info page can show
 	// all currently alive nodes in multi-instance deployments.
 	service.StartSystemInstanceReporter()

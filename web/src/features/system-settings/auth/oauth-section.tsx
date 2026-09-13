@@ -39,6 +39,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import { handleServerError } from '@/lib/handle-server-error'
 
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
@@ -66,6 +67,16 @@ const oauthSchema = z.object({
   GitHubOAuthEnabled: z.boolean(),
   GitHubClientId: z.string(),
   GitHubClientSecret: z.string(),
+  GithubStarRewardEnabled: z.boolean(),
+  GithubStarRewardDryRun: z.boolean(),
+  GithubStarOwner: z.string(),
+  GithubStarRepo: z.string(),
+  GithubStarCampaign: z.string(),
+  GithubStarRewardQuota: z.string(),
+  GithubStarAppId: z.string(),
+  GithubStarInstallationId: z.string(),
+  GithubStarPrivateKey: z.string(),
+  GithubStarSyncEnabled: z.boolean(),
   discord: z.object({
     enabled: z.boolean(),
     client_id: z.string(),
@@ -99,6 +110,16 @@ type FlatOAuthDefaults = {
   GitHubOAuthEnabled: boolean
   GitHubClientId: string
   GitHubClientSecret: string
+  GithubStarRewardEnabled: boolean
+  GithubStarRewardDryRun: boolean
+  GithubStarOwner: string
+  GithubStarRepo: string
+  GithubStarCampaign: string
+  GithubStarRewardQuota: string
+  GithubStarAppId: string
+  GithubStarInstallationId: string
+  GithubStarPrivateKey: string
+  GithubStarSyncEnabled: boolean
   'discord.enabled': boolean
   'discord.client_id': string
   'discord.client_secret': string
@@ -179,6 +200,16 @@ const buildFormDefaults = (defaults: FlatOAuthDefaults): OAuthFormValues => ({
   GitHubOAuthEnabled: defaults.GitHubOAuthEnabled,
   GitHubClientId: defaults.GitHubClientId ?? '',
   GitHubClientSecret: defaults.GitHubClientSecret ?? '',
+  GithubStarRewardEnabled: defaults.GithubStarRewardEnabled,
+  GithubStarRewardDryRun: defaults.GithubStarRewardDryRun,
+  GithubStarOwner: defaults.GithubStarOwner ?? '',
+  GithubStarRepo: defaults.GithubStarRepo ?? '',
+  GithubStarCampaign: defaults.GithubStarCampaign ?? '',
+  GithubStarRewardQuota: defaults.GithubStarRewardQuota ?? '',
+  GithubStarAppId: defaults.GithubStarAppId ?? '',
+  GithubStarInstallationId: defaults.GithubStarInstallationId ?? '',
+  GithubStarPrivateKey: defaults.GithubStarPrivateKey ?? '',
+  GithubStarSyncEnabled: defaults.GithubStarSyncEnabled,
   discord: {
     enabled: defaults['discord.enabled'],
     client_id: defaults['discord.client_id'] ?? '',
@@ -213,6 +244,16 @@ const normalizeFormValues = (values: OAuthFormValues): FlatOAuthDefaults => ({
   GitHubOAuthEnabled: values.GitHubOAuthEnabled,
   GitHubClientId: values.GitHubClientId,
   GitHubClientSecret: values.GitHubClientSecret,
+  GithubStarRewardEnabled: values.GithubStarRewardEnabled,
+  GithubStarRewardDryRun: values.GithubStarRewardDryRun,
+  GithubStarOwner: values.GithubStarOwner,
+  GithubStarRepo: values.GithubStarRepo,
+  GithubStarCampaign: values.GithubStarCampaign,
+  GithubStarRewardQuota: values.GithubStarRewardQuota,
+  GithubStarAppId: values.GithubStarAppId,
+  GithubStarInstallationId: values.GithubStarInstallationId,
+  GithubStarPrivateKey: values.GithubStarPrivateKey,
+  GithubStarSyncEnabled: values.GithubStarSyncEnabled,
   'discord.enabled': values.discord.enabled,
   'discord.client_id': values.discord.client_id,
   'discord.client_secret': values.discord.client_secret,
@@ -480,6 +521,274 @@ export function OAuthSection(props: OAuthSectionProps) {
                       </FormControl>
                       <FormMessage />
                     </FormItem>
+                  )}
+                />
+
+                <div className='border-t pt-5 lg:col-span-2'>
+                  <h3 className='text-sm font-semibold'>
+                    {t('GitHub Star Reward')}
+                  </h3>
+                  <p className='text-muted-foreground mt-1 text-sm'>
+                    {t(
+                      'Create a GitHub App with read-only Metadata permission and install it on the target repository. Users bound to GitHub can claim a one-time credit reward after starring the repository.',
+                    )}
+                  </p>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarRewardEnabled'
+                  render={({ field }) => (
+                    <SettingsSwitchItem>
+                      <SettingsSwitchContent>
+                        <FormLabel>{t('Enable GitHub Star Reward')}</FormLabel>
+                        <FormDescription>
+                          {t(
+                            'Show the reward entry on the welfare airdrop page and allow claiming',
+                          )}
+                        </FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </SettingsSwitchItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarOwner'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Repository Owner')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='Mr-Groundhog'
+                          autoComplete='off'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarRepo'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Repository Name')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='hog-api-gateway'
+                          autoComplete='off'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarRewardQuota'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Reward Quota')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='5000000'
+                          autoComplete='off'
+                          inputMode='numeric'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t('Internal quota units (500000 = $1 by default)')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarCampaign'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Campaign Key')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='github-star'
+                          autoComplete='off'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t('Change to a new value to start another reward round')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarAppId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('GitHub App ID')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='123456'
+                          autoComplete='off'
+                          inputMode='numeric'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarInstallationId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Installation ID')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='12345678'
+                          autoComplete='off'
+                          inputMode='numeric'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Found at the end of the URL on github.com/settings/installations',
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarPrivateKey'
+                  render={({ field }) => (
+                    <FormItem className='lg:col-span-2'>
+                      <FormLabel>{t('App Private Key (PEM)')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={'-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'}
+                          autoComplete='off'
+                          rows={5}
+                          className='font-mono text-xs'
+                          value={field.value ?? ''}
+                          onChange={(event) =>
+                            field.onChange(event.target.value)
+                          }
+                          name={field.name}
+                          onBlur={field.onBlur}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Downloaded when generating the private key in the GitHub App settings',
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarRewardDryRun'
+                  render={({ field }) => (
+                    <SettingsSwitchItem>
+                      <SettingsSwitchContent>
+                        <FormLabel>{t('Dry run mode')}</FormLabel>
+                        <FormDescription>
+                          {t(
+                            'Perform star detection and audit only; no credits are granted',
+                          )}
+                        </FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </SettingsSwitchItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='GithubStarSyncEnabled'
+                  render={({ field }) => (
+                    <SettingsSwitchItem>
+                      <SettingsSwitchContent>
+                        <FormLabel>{t('Sync stargazers periodically')}</FormLabel>
+                        <FormDescription>
+                          {t(
+                            'Refresh the local stargazers cache every 8 hours to reduce GitHub API calls on claim',
+                          )}
+                        </FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </SettingsSwitchItem>
                   )}
                 />
               </TabsContent>

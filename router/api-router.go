@@ -392,6 +392,23 @@ func SetApiRouter(router *gin.Engine) {
 			airdropRoute.POST("/claim", controller.ClaimWelfareAirdrop)
 			airdropRoute.POST("/claim/:id", controller.ClaimWelfareAirdrop)
 		}
+		// GitHub Star 奖励：用户申请领取，管理员批准 / 拒绝 / 复审 / 重检 / 撤销
+		githubStarRoute := apiRouter.Group("/github-star-reward")
+		githubStarRoute.Use(middleware.UserAuth())
+		{
+			githubStarRoute.GET("", controller.GetGithubStarRewardStatus)
+			githubStarRoute.POST("/claim", middleware.CriticalRateLimit(), middleware.GithubStarClaimRateLimit(), controller.ClaimGithubStarReward)
+		}
+		githubStarAdminRoute := apiRouter.Group("/github-star-reward/admin")
+		githubStarAdminRoute.Use(middleware.AdminAuth())
+		{
+			githubStarAdminRoute.GET("/claims", controller.GetGithubStarRewardClaims)
+			githubStarAdminRoute.GET("/audit-logs", controller.GetGithubStarAuditLogs)
+			githubStarAdminRoute.POST("/claims/:id/approve", controller.ApproveGithubStarRewardClaim)
+			githubStarAdminRoute.POST("/claims/:id/reject", controller.RejectGithubStarRewardClaim)
+			githubStarAdminRoute.POST("/claims/:id/recheck", controller.RecheckGithubStarRewardClaim)
+			githubStarAdminRoute.POST("/claims/:id/revoke", controller.RevokeGithubStarRewardClaim)
+		}
 		ticketRoute := apiRouter.Group("/ticket")
 		ticketRoute.Use(middleware.UserAuth())
 		{

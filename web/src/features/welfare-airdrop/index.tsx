@@ -19,7 +19,7 @@ import {
   Sparkles,
   TicketCheck,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -34,6 +34,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import { GithubStarRewardEntry } from '@/features/github-star-reward/github-star-reward-entry'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatQuota, formatTimestampToDate } from '@/lib/format'
 
@@ -72,30 +73,27 @@ const CONFETTI_COLORS = [
 function AirdropConverge() {
   const streaks = useMemo(
     () =>
-      Array.from({ length: 30 }, (_, i) => {
-        const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.45
-        const distance = 280 + Math.random() * 280
-        return {
-          sx: Math.round(Math.cos(angle) * distance),
-          sy: Math.round(Math.sin(angle) * distance),
-          rot: Math.round((angle * 180) / Math.PI),
-          delay: (Math.random() * 0.35).toFixed(3),
-          duration: (0.65 + Math.random() * 0.5).toFixed(3),
-          width: 12 + Math.round(Math.random() * 14),
-          color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-        }
-      }),
+      Array.from({ length: 30 }, () => ({
+        id: Math.random().toString(36).slice(2),
+        angle: Math.random() * Math.PI * 2 + (Math.random() - 0.5) * 0.45,
+        distance: 280 + Math.random() * 280,
+        rot: Math.round(Math.random() * 360),
+        delay: (Math.random() * 0.35).toFixed(3),
+        duration: (0.65 + Math.random() * 0.5).toFixed(3),
+        width: 12 + Math.round(Math.random() * 14),
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      })),
     [],
   )
   return (
     <div className="airdrop-converge" aria-hidden="true">
-      {streaks.map((streak, index) => (
+      {streaks.map((streak) => (
         <span
-          key={index}
+          key={streak.id}
           style={
             {
-              '--sx': `${streak.sx}px`,
-              '--sy': `${streak.sy}px`,
+              '--sx': `${Math.round(Math.cos(streak.angle) * streak.distance)}px`,
+              '--sy': `${Math.round(Math.sin(streak.angle) * streak.distance)}px`,
               '--rot': `${streak.rot}deg`,
               '--delay': `${streak.delay}s`,
               '--dur': `${streak.duration}s`,
@@ -112,17 +110,18 @@ function AirdropConverge() {
 function AirdropConfetti() {
   const pieces = useMemo(
     () =>
-      Array.from({ length: 34 }, (_, i) => {
-        const angle = (i / 34) * Math.PI * 2 + (Math.random() - 0.5) * 0.5
+      Array.from({ length: 34 }, () => {
+        const angle = Math.random() * Math.PI * 2 + (Math.random() - 0.5) * 0.5
         const distance = 110 + Math.random() * 240
         return {
+          id: Math.random().toString(36).slice(2),
           tx: Math.round(Math.cos(angle) * distance),
           ty: Math.round(Math.sin(angle) * distance - 40),
           fall: Math.round(240 + Math.random() * 300),
           rot: Math.round((Math.random() - 0.5) * 900),
           delay: (Math.random() * 0.25).toFixed(3),
           duration: (2.4 + Math.random() * 1.3).toFixed(3),
-          color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+          color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
           width: 5 + Math.round(Math.random() * 7),
           height: 8 + Math.round(Math.random() * 9),
           round: Math.random() > 0.62,
@@ -132,9 +131,9 @@ function AirdropConfetti() {
   )
   return (
     <div className="airdrop-confetti" aria-hidden="true">
-      {pieces.map((piece, index) => (
+      {pieces.map((piece) => (
         <span
-          key={index}
+          key={piece.id}
           style={
             {
               '--tx': `${piece.tx}px`,
@@ -197,6 +196,17 @@ function CampaignCard({
     claimLabel = t('Claiming...')
   } else if (campaign.canClaim) {
     claimLabel = t('Claim credit')
+  }
+  let claimIcon = <Sparkles aria-hidden="true" />
+  if (pending) {
+    claimIcon = <LoaderCircle className="animate-spin" aria-hidden="true" />
+  } else if (celebrating) {
+    claimIcon = (
+      <>
+        <Check className="airdrop-claim-success-icon" aria-hidden="true" />
+        <span className="airdrop-claim-burst" aria-hidden="true"><i /><i /><i /><i /></span>
+      </>
+    )
   }
   return (
     <article className={`airdrop-glow airdrop-enter h-full flex flex-col overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 via-background to-violet-500/10 transition-transform duration-300 hover:-translate-y-1 ${celebrating ? 'airdrop-card-celebrating' : ''}`}>
@@ -270,16 +280,7 @@ function CampaignCard({
           disabled={!campaign.canClaim || pending || celebrating}
           onClick={onClaim}
         >
-          {celebrating ? (
-            <>
-              <Check className="airdrop-claim-success-icon" aria-hidden="true" />
-              <span className="airdrop-claim-burst" aria-hidden="true"><i /><i /><i /><i /></span>
-            </>
-          ) : pending ? (
-            <LoaderCircle className="animate-spin" aria-hidden="true" />
-          ) : (
-            <Sparkles aria-hidden="true" />
-          )}
+          {claimIcon}
           {claimLabel}
         </Button>
       </div>
@@ -370,6 +371,72 @@ export function WelfareAirdrop() {
   })
   const campaigns = query.data ?? []
   const claims = claimsQuery.data ?? []
+
+  let campaignSection: ReactNode
+  if (query.isLoading) {
+    campaignSection = (
+      <div className="text-cyan-500 flex justify-center py-16">
+        <LoaderCircle className="size-8 animate-spin" aria-hidden="true" />
+      </div>
+    )
+  } else if (campaigns.length === 0) {
+    campaignSection = (
+      <div className="flex flex-col items-center gap-6 rounded-xl border border-dashed px-6 py-12 text-center">
+        <AirdropOrb />
+        <p className="text-muted-foreground max-w-md">
+          {t(
+            'The next welfare drop is being prepared. Stay tuned for the launch signal.',
+          )}
+        </p>
+      </div>
+    )
+  } else {
+    campaignSection = (
+      <Carousel
+        className="airdrop-enter w-full"
+        opts={{ loop: campaigns.length > 1 }}
+      >
+        <CarouselContent>
+          {campaigns.map((campaign) => (
+            <CarouselItem key={campaign.id}>
+              <CampaignCard
+                campaign={campaign}
+                pending={claimingId === campaign.id}
+                celebrating={celebratingId === campaign.id}
+                onClaim={() => mutation.mutate(campaign.id)}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        {campaigns.length > 1 && (
+          <>
+            <CarouselPrevious className="-left-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-left-6" />
+            <CarouselNext className="-right-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-right-6" />
+          </>
+        )}
+      </Carousel>
+    )
+  }
+
+  let claimsList: ReactNode
+  if (claimsQuery.isLoading) {
+    claimsList = (
+      <div className="text-muted-foreground flex justify-center py-8">
+        <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
+      </div>
+    )
+  } else if (claims.length === 0) {
+    claimsList = (
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        {t('No claim records yet')}
+      </p>
+    )
+  } else {
+    claimsList = claims.map((claim) => (
+      <ClaimRecord key={claim.id} claim={claim} />
+    ))
+  }
+
   return (
     <SectionPageLayout>
       <SectionPageLayout.Title>
@@ -379,6 +446,7 @@ export function WelfareAirdrop() {
         </span>
       </SectionPageLayout.Title>
       <SectionPageLayout.Actions>
+        <GithubStarRewardEntry />
         <Button
           variant="outline"
           size="sm"
@@ -429,44 +497,7 @@ export function WelfareAirdrop() {
           </>
         )}
         <div className="mx-auto w-full max-w-5xl space-y-6 py-2">
-          {query.isLoading ? (
-            <div className="text-cyan-500 flex justify-center py-16">
-              <LoaderCircle className="size-8 animate-spin" aria-hidden="true" />
-            </div>
-          ) : campaigns.length === 0 ? (
-            <div className="flex flex-col items-center gap-6 rounded-xl border border-dashed px-6 py-12 text-center">
-              <AirdropOrb />
-              <p className="text-muted-foreground max-w-md">
-                {t(
-                  'The next welfare drop is being prepared. Stay tuned for the launch signal.',
-                )}
-              </p>
-            </div>
-          ) : (
-            <Carousel
-              className="airdrop-enter w-full"
-              opts={{ loop: campaigns.length > 1 }}
-            >
-              <CarouselContent>
-                {campaigns.map((campaign) => (
-                  <CarouselItem key={campaign.id}>
-                    <CampaignCard
-                      campaign={campaign}
-                      pending={claimingId === campaign.id}
-                      celebrating={celebratingId === campaign.id}
-                      onClaim={() => mutation.mutate(campaign.id)}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              {campaigns.length > 1 && (
-                <>
-                  <CarouselPrevious className="-left-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-left-6" />
-                  <CarouselNext className="-right-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-right-6" />
-                </>
-              )}
-            </Carousel>
-          )}
+          {campaignSection}
 
           <section className="airdrop-enter airdrop-enter-3 rounded-xl border">
             <h2 className="flex items-center gap-2 border-b px-5 py-4 font-semibold">
@@ -476,24 +507,7 @@ export function WelfareAirdrop() {
               />
               {t('Claim records')}
             </h2>
-            <div className="px-5 py-1">
-              {claimsQuery.isLoading ? (
-                <div className="text-muted-foreground flex justify-center py-8">
-                  <LoaderCircle
-                    className="size-6 animate-spin"
-                    aria-hidden="true"
-                  />
-                </div>
-              ) : claims.length === 0 ? (
-                <p className="text-muted-foreground py-8 text-center text-sm">
-                  {t('No claim records yet')}
-                </p>
-              ) : (
-                claims.map((claim) => (
-                  <ClaimRecord key={claim.id} claim={claim} />
-                ))
-              )}
-            </div>
+            <div className="px-5 py-1">{claimsList}</div>
           </section>
         </div>
       </SectionPageLayout.Content>

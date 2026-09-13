@@ -703,4 +703,26 @@ export const STATIC_I18N_KEYS = [
   'Back to top',
   'Title must be between {{min}} and {{max}} characters',
   'Content must be between {{min}} and {{max}} characters',
+
+  // GitHub Star reward — claim status and audit action/result labels
+  // (features/github-star-reward/constants.ts, passed into t() at runtime)
+  'Pending review',
+  'Granted',
+  'Rejected',
+  'Revoked',
+  'Claim',
+  'Approve',
+  'Reject',
+  'Sync',
+  'Submitted',
+  'Granted (dry run)',
+  'Already claimed',
+  'Not starred',
+  'Token invalid',
+  'Check failed',
+  'Approved',
+  'Rejected by admin',
+  'Recheck completed',
+  'Sync succeeded',
+  'Sync failed',
 ] as const

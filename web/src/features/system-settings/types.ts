@@ -134,6 +134,16 @@ export type AuthSettings = {
   GitHubOAuthEnabled: boolean
   GitHubClientId: string
   GitHubClientSecret: string
+  GithubStarRewardEnabled: boolean
+  GithubStarRewardDryRun: boolean
+  GithubStarOwner: string
+  GithubStarRepo: string
+  GithubStarCampaign: string
+  GithubStarRewardQuota: string
+  GithubStarAppId: string
+  GithubStarInstallationId: string
+  GithubStarPrivateKey: string
+  GithubStarSyncEnabled: boolean
   'discord.enabled': boolean
   'discord.client_id': string
   'discord.client_secret': string

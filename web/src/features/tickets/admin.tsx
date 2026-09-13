@@ -14,7 +14,9 @@ import { useTranslation } from 'react-i18next'
 
 import { useDataTable } from '@/components/data-table'
 import { SectionPageLayout } from '@/components/layout'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useTableUrlState } from '@/hooks/use-table-url-state'
+import { GithubStarClaimsTable } from '@/features/github-star-reward/admin-claims-table'
 
 import { buildAdminTicketParams, getAdminTickets, ticketQueryKeys } from './api'
 import { AdminTicketDetailSheet } from './components/admin-ticket-detail-sheet'
@@ -37,8 +39,9 @@ const EMPTY_FILTERS: AdminTicketFilters = {
 }
 
 /**
- * 管理端「工单管理」页面：统计与筛选工具栏 + 全量工单表格 + 详情抽屉。
- * 表格使用与用量日志一致的 DataTablePage 结构，固定表头并在页面底部渲染通用分页。
+ * 管理端「工单管理」页面：工单表格 + Star 领取审批两个 Tab。
+ * 工单 Tab 为统计与筛选工具栏 + 全量工单表格 + 详情抽屉，表格使用与用量日志
+ * 一致的 DataTablePage 结构；Star 领取审批 Tab 复用 GitHub Star 领取记录表格。
  */
 export function TicketManagement() {
   const { t } = useTranslation()
@@ -140,32 +143,45 @@ export function TicketManagement() {
       </SectionPageLayout.Title>
       <SectionPageLayout.Content>
         <div className='flex h-full min-h-0 flex-col gap-4'>
-          <div className='min-h-0 flex-1'>
-            <TicketDataTable
-              table={table}
-              columns={columns}
-              toolbar={
-                <TicketFiltersBar
-                  scope='admin'
-                  table={table}
-                  fetching={listQuery.isFetching}
-                  stats={statsQuery.data}
-                  statsLoading={statsQuery.isLoading}
-                  onSearch={handleSearch}
-                  onRefresh={() => void listQuery.refetch()}
-                  onReset={handleReset}
-                />
-              }
-              isLoading={listQuery.isLoading}
-              isFetching={listQuery.isFetching}
-              onOpenTicket={handleOpenTicket}
-              emptyTitle={t('No tickets yet')}
-              emptyDescription={t(
-                'Submitted tickets will appear here for admin review and replies.'
-              )}
-              skeletonKeyPrefix='admin-ticket-skeleton'
-            />
-          </div>
+          <Tabs defaultValue='tickets' className='flex min-h-0 flex-1 flex-col'>
+            <div className='shrink-0 pb-3'>
+              <TabsList>
+                <TabsTrigger value='tickets'>{t('Tickets')}</TabsTrigger>
+                <TabsTrigger value='star-claims'>
+                  {t('Star claim approvals')}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value='tickets' className='min-h-0 flex-1'>
+              <TicketDataTable
+                table={table}
+                columns={columns}
+                toolbar={
+                  <TicketFiltersBar
+                    scope='admin'
+                    table={table}
+                    fetching={listQuery.isFetching}
+                    stats={statsQuery.data}
+                    statsLoading={statsQuery.isLoading}
+                    onSearch={handleSearch}
+                    onRefresh={() => void listQuery.refetch()}
+                    onReset={handleReset}
+                  />
+                }
+                isLoading={listQuery.isLoading}
+                isFetching={listQuery.isFetching}
+                onOpenTicket={handleOpenTicket}
+                emptyTitle={t('No tickets yet')}
+                emptyDescription={t(
+                  'Submitted tickets will appear here for admin review and replies.'
+                )}
+                skeletonKeyPrefix='admin-ticket-skeleton'
+              />
+            </TabsContent>
+            <TabsContent value='star-claims' className='min-h-0 flex-1'>
+              <GithubStarClaimsTable />
+            </TabsContent>
+          </Tabs>
 
           <AdminTicketDetailSheet
             open={detailId !== null}

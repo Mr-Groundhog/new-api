@@ -62,6 +62,9 @@ func TestMain(m *testing.M) {
 		&RegistrationCode{},
 		&Ticket{},
 		&TicketMessage{},
+		&GithubStarRewardClaim{},
+		&GithubStargazer{},
+		&GithubStarAuditLog{},
 	); err != nil {
 		panic("failed to migrate: " + err.Error())
 	}
@@ -94,6 +97,9 @@ func truncateTables(t *testing.T) {
 		DB.Exec("DELETE FROM system_instances")
 		DB.Exec("DELETE FROM system_task_locks")
 		DB.Exec("DELETE FROM system_tasks")
+		DB.Exec("DELETE FROM github_star_reward_claims")
+		DB.Exec("DELETE FROM github_stargazers")
+		DB.Exec("DELETE FROM github_star_audit_logs")
 	})
 }
 

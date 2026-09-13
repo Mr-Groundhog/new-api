@@ -69,6 +69,8 @@ var auditContentTemplates = map[string]string{
 	"subscription.user_plan_reset": "Reset active plan ${plan_id} subscriptions for user ${target_user_id}",
 
 	"lottery.draw": "Won the lottery prize ${prize} (quota +${quota})",
+
+	"github_star.revoke": "Revoked GitHub Star reward claim #${claim_id} (quota -${quota}, reason: ${reason})",
 }
 
 // auditContentEN 按 action 模板渲染英文兜底文本；未登记的 action 退回 action 本身。

@@ -266,3 +266,10 @@ func SearchRateLimit() func(c *gin.Context) {
 	}
 	return userRateLimitFactory(common.SearchRateLimitNum, common.SearchRateLimitDuration, "SR")
 }
+
+// GithubStarClaimRateLimit 是 GitHub Star 奖励申请接口的按用户限流（方案 9.3），
+// 与按 IP 的 CriticalRateLimit 叠加使用：每用户 60 秒内最多 5 次申请。
+// 必须放在 UserAuth 之后使用。
+func GithubStarClaimRateLimit() func(c *gin.Context) {
+	return userRateLimitFactory(5, 60, "UC:github-star-claim")
+}

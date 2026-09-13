@@ -43,6 +43,16 @@ func InitOptionMap() {
 	common.OptionMap["PasswordRegisterEnabled"] = strconv.FormatBool(common.PasswordRegisterEnabled)
 	common.OptionMap["EmailVerificationEnabled"] = strconv.FormatBool(common.EmailVerificationEnabled)
 	common.OptionMap["GitHubOAuthEnabled"] = strconv.FormatBool(common.GitHubOAuthEnabled)
+	common.OptionMap["GithubStarRewardEnabled"] = strconv.FormatBool(common.GithubStarRewardEnabled)
+	common.OptionMap["GithubStarRewardDryRun"] = strconv.FormatBool(common.GithubStarRewardDryRun)
+	common.OptionMap["GithubStarOwner"] = common.GithubStarOwner
+	common.OptionMap["GithubStarRepo"] = common.GithubStarRepo
+	common.OptionMap["GithubStarCampaign"] = common.GithubStarCampaign
+	common.OptionMap["GithubStarRewardQuota"] = strconv.Itoa(common.GithubStarRewardQuota)
+	common.OptionMap["GithubStarAppId"] = common.GithubStarAppId
+	common.OptionMap["GithubStarInstallationId"] = strconv.FormatInt(common.GithubStarInstallationId, 10)
+	common.OptionMap["GithubStarPrivateKey"] = common.GithubStarPrivateKey
+	common.OptionMap["GithubStarSyncEnabled"] = strconv.FormatBool(common.GithubStarSyncEnabled)
 	common.OptionMap["LinuxDOOAuthEnabled"] = strconv.FormatBool(common.LinuxDOOAuthEnabled)
 	common.OptionMap["TelegramOAuthEnabled"] = strconv.FormatBool(common.TelegramOAuthEnabled)
 	common.OptionMap["WeChatAuthEnabled"] = strconv.FormatBool(common.WeChatAuthEnabled)
@@ -342,6 +352,10 @@ func updateOptionMap(key string, value string) (err error) {
 			common.EmailVerificationEnabled = boolValue
 		case "GitHubOAuthEnabled":
 			common.GitHubOAuthEnabled = boolValue
+		case "GithubStarRewardEnabled":
+			common.GithubStarRewardEnabled = boolValue
+		case "GithubStarSyncEnabled":
+			common.GithubStarSyncEnabled = boolValue
 		case "LinuxDOOAuthEnabled":
 			common.LinuxDOOAuthEnabled = boolValue
 		case "WeChatAuthEnabled":
@@ -544,6 +558,33 @@ func updateOptionMap(key string, value string) (err error) {
 		common.GitHubClientId = value
 	case "GitHubClientSecret":
 		common.GitHubClientSecret = value
+	case "GithubStarOwner":
+		common.GithubStarOwner = value
+	case "GithubStarRepo":
+		common.GithubStarRepo = value
+	case "GithubStarCampaign":
+		common.GithubStarCampaign = value
+		if common.GithubStarCampaign == "" {
+			common.GithubStarCampaign = "github-star"
+		}
+	case "GithubStarAppId":
+		common.GithubStarAppId = value
+	case "GithubStarPrivateKey":
+		common.GithubStarPrivateKey = value
+	case "GithubStarRewardDryRun":
+		common.GithubStarRewardDryRun = value == "true"
+	case "GithubStarRewardQuota":
+		quota, parseErr := strconv.Atoi(value)
+		if parseErr != nil || quota < 0 {
+			quota = 0
+		}
+		common.GithubStarRewardQuota = min(quota, common.MaxQuota)
+	case "GithubStarInstallationId":
+		installationId, parseErr := strconv.ParseInt(value, 10, 64)
+		if parseErr != nil || installationId < 0 {
+			installationId = 0
+		}
+		common.GithubStarInstallationId = installationId
 	case "LinuxDOClientId":
 		common.LinuxDOClientId = value
 	case "LinuxDOClientSecret":

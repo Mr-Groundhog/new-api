@@ -9,7 +9,7 @@ License, or (at your option) any later version.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { LoaderCircle, Settings } from 'lucide-react'
-import { useCallback } from 'react'
+import { useCallback, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -141,43 +141,46 @@ export function AdminCampaigns() {
   })
   if (!isAdmin) return null
   const campaigns = query.data ?? []
+  let list: ReactNode
+  if (query.isLoading) {
+    list = (
+      <div className="text-muted-foreground flex justify-center py-8">
+        <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
+      </div>
+    )
+  } else if (campaigns.length === 0) {
+    list = (
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        {t('No campaigns yet')}
+      </p>
+    )
+  } else {
+    list = campaigns.map((campaign) => (
+      <AdminCampaignRow
+        key={campaign.id}
+        campaign={campaign}
+        pending={
+          (toggleMutation.isPending &&
+            toggleMutation.variables?.id === campaign.id) ||
+          (deleteMutation.isPending && deleteMutation.variables === campaign.id)
+        }
+        onToggle={() =>
+          toggleMutation.mutate({
+            id: campaign.id,
+            status: campaign.status === 1 ? 2 : 1,
+          })
+        }
+        onDelete={() => deleteMutation.mutate(campaign.id)}
+      />
+    ))
+  }
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border">
       <h2 className="flex shrink-0 items-center gap-2 border-b px-5 py-4 font-semibold">
         <Settings className="size-4 text-cyan-500" aria-hidden="true" />
         {t('Campaign management')}
       </h2>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-1">
-        {query.isLoading ? (
-          <div className="text-muted-foreground flex justify-center py-8">
-            <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
-          </div>
-        ) : campaigns.length === 0 ? (
-          <p className="text-muted-foreground py-8 text-center text-sm">
-            {t('No campaigns yet')}
-          </p>
-        ) : (
-          campaigns.map((campaign) => (
-            <AdminCampaignRow
-              key={campaign.id}
-              campaign={campaign}
-              pending={
-                (toggleMutation.isPending &&
-                  toggleMutation.variables?.id === campaign.id) ||
-                (deleteMutation.isPending &&
-                  deleteMutation.variables === campaign.id)
-              }
-              onToggle={() =>
-                toggleMutation.mutate({
-                  id: campaign.id,
-                  status: campaign.status === 1 ? 2 : 1,
-                })
-              }
-              onDelete={() => deleteMutation.mutate(campaign.id)}
-            />
-          ))
-        )}
-      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-1">{list}</div>
     </div>
   )
 }
