@@ -47,9 +47,8 @@ export function RedemptionsProvider({
 }) {
   const [open, setOpen] = useDialogState<RedemptionsDialogType>(null)
   const [currentRow, setCurrentRow] = useState<Redemption | null>(null)
-  const [createType, setCreateType] = useState<RedemptionCreateType>(
-    'redemption'
-  )
+  const [createType, setCreateType] =
+    useState<RedemptionCreateType>('redemption')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const triggerRefresh = () => setRefreshTrigger((prev) => prev + 1)

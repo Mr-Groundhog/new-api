@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   fireEvent,
   render,
@@ -26,8 +27,6 @@ import {
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { afterEach, expect, test, vi } from 'vitest'
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { api } from '@/lib/api'
 import {
@@ -212,9 +211,7 @@ test('successful batch creation closes the drawer without opening an export dial
   })
   await userEvent
     .setup()
-    .click(
-      within(createDialog).getByRole('button', { name: 'Save changes' })
-    )
+    .click(within(createDialog).getByRole('button', { name: 'Save changes' }))
   await waitFor(() =>
     expect(
       screen.queryByRole('dialog', { name: 'Create Redemption Code' })

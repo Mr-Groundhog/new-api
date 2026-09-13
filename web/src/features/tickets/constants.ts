@@ -33,6 +33,10 @@ export const TICKET_TYPES: Record<number, { labelKey: string; value: number }> =
       value: TICKET_TYPE.BILLING,
     },
     [TICKET_TYPE.OTHER]: { labelKey: 'Other', value: TICKET_TYPE.OTHER },
+    [TICKET_TYPE.COOPERATION]: {
+      labelKey: 'Site Cooperation & Promotion',
+      value: TICKET_TYPE.COOPERATION,
+    },
   }
 
 export const TICKET_TYPE_VALUES: number[] = Object.values(TICKET_TYPES).map(

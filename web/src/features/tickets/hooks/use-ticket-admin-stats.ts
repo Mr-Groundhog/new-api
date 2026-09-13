@@ -9,8 +9,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 import { useQuery } from '@tanstack/react-query'
 
-import { useAuthStore } from '@/stores/auth-store'
 import { ROLE } from '@/lib/roles'
+import { useAuthStore } from '@/stores/auth-store'
 
 import { getAdminTicketStats, ticketQueryKeys } from '../api'
 

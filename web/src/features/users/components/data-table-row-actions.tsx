@@ -58,8 +58,8 @@ import {
 } from '../constants'
 import { getUserActionMessage } from '../lib'
 import type { User, ManageUserAction } from '../types'
-import { UserBindingDialog } from './dialogs/user-binding-dialog'
 import { BanReasonDialog } from './ban-reason-dialog'
+import { UserBindingDialog } from './dialogs/user-binding-dialog'
 import { useUsers } from './users-provider'
 
 interface DataTableRowActionsProps {

@@ -100,7 +100,8 @@ export function ReviewProgress(props: { claim: GithubStarRewardClaim }) {
     }
   }
 
-  const reviewAt = claim.status === 'granted' ? claim.granted_at : claim.revoked_at
+  const reviewAt =
+    claim.status === 'granted' ? claim.granted_at : claim.revoked_at
   const stages: Stage[] = [
     {
       key: 'claimed',
@@ -168,7 +169,7 @@ export function ReviewProgress(props: { claim: GithubStarRewardClaim }) {
       {claim.status === 'pending' && (
         <p className='bg-muted text-muted-foreground rounded-lg p-3 text-xs leading-relaxed'>
           {t(
-            'No need to claim again. The system syncs star records every 8 hours; check the review progress here anytime. Contact the admin via a ticket if you have any questions.',
+            'No need to claim again. The system syncs star records every 8 hours; check the review progress here anytime. Contact the admin via a ticket if you have any questions.'
           )}
         </p>
       )}

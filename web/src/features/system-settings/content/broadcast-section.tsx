@@ -338,7 +338,9 @@ export function BroadcastSection({ enabled, data }: BroadcastSectionProps) {
         <StaticDataTable
           data={broadcasts}
           getRowKey={(broadcast) => broadcast.id}
-          emptyContent={t('No broadcasts yet. Click "Add Broadcast" to create one.')}
+          emptyContent={t(
+            'No broadcasts yet. Click "Add Broadcast" to create one.'
+          )}
           columns={[
             {
               id: 'select',
@@ -411,9 +413,7 @@ export function BroadcastSection({ enabled, data }: BroadcastSectionProps) {
                     variant='ghost'
                     size='icon-sm'
                     onClick={() => handleTogglePin(broadcast)}
-                    aria-label={
-                      broadcast.pinned ? t('Unpin') : t('Pin to top')
-                    }
+                    aria-label={broadcast.pinned ? t('Unpin') : t('Pin to top')}
                     title={broadcast.pinned ? t('Unpin') : t('Pin to top')}
                   >
                     {broadcast.pinned ? (
@@ -548,7 +548,7 @@ export function BroadcastSection({ enabled, data }: BroadcastSectionProps) {
               control={form.control}
               name='pinned'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center gap-3 rounded-md border border-border p-3'>
+                <FormItem className='border-border flex flex-row items-center gap-3 rounded-md border p-3'>
                   <FormControl>
                     <Checkbox
                       checked={field.value}

@@ -16,9 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { type Table } from '@tanstack/react-table'
 import { Ban, Download, LoaderCircle } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { type Table } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -96,9 +96,7 @@ export function DataTableBulkActions<TData>({
       )
       const failed = results.filter((result) => !result.success).length
       if (failed > 0) {
-        toast.error(
-          t('Failed to disable {{count}} codes', { count: failed })
-        )
+        toast.error(t('Failed to disable {{count}} codes', { count: failed }))
       } else {
         toast.success(
           t('Successfully disabled {{count}} codes', {
@@ -155,11 +153,7 @@ export function DataTableBulkActions<TData>({
             />
           }
         >
-          {isDisabling ? (
-            <LoaderCircle className='animate-spin' />
-          ) : (
-            <Ban />
-          )}
+          {isDisabling ? <LoaderCircle className='animate-spin' /> : <Ban />}
           <span className='sr-only'>{t('Disable selected codes')}</span>
         </TooltipTrigger>
         <TooltipContent>

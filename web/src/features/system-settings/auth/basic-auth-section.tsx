@@ -165,9 +165,7 @@ export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
                 <SettingsSwitchContent>
                   <FormLabel>{t('Registration Code Required')}</FormLabel>
                   <FormDescription>
-                    {t(
-                      'Require a valid registration code when signing up'
-                    )}
+                    {t('Require a valid registration code when signing up')}
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>

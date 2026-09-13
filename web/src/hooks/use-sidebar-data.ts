@@ -24,6 +24,7 @@ import {
   FileText,
   FlaskConical,
   Gift,
+  Handshake,
   Inbox,
   Key,
   LayoutDashboard,
@@ -45,6 +46,7 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import type { SidebarData } from '@/components/layout/types'
+import { useCooperationAdminPendingCount } from '@/features/cooperation/hooks/use-cooperation-admin-stats'
 import { useTicketAdminPendingCount } from '@/features/tickets/hooks/use-ticket-admin-stats'
 import { useTicketUnread } from '@/features/tickets/hooks/use-ticket-unread'
 import { ROLE } from '@/lib/roles'
@@ -61,6 +63,7 @@ export function useSidebarData(): SidebarData {
   // 与 useSidebarConfig 的模块开关叠加，模块被关闭时条目整体隐藏
   const ticketUnread = useTicketUnread()
   const ticketPending = useTicketAdminPendingCount()
+  const cooperationPending = useCooperationAdminPendingCount()
 
   return {
     navGroups: [
@@ -151,6 +154,11 @@ export function useSidebarData(): SidebarData {
             badge: t('Limited time'),
             badgeTone: 'attention',
           },
+          {
+            title: t('Cooperation & Promotion'),
+            url: '/cooperation',
+            icon: Handshake,
+          },
         ],
       },
       {
@@ -182,6 +190,14 @@ export function useSidebarData(): SidebarData {
             url: '/ticket-management',
             icon: Inbox,
             badge: ticketPending > 0 ? String(ticketPending) : undefined,
+            badgeTone: 'danger',
+          },
+          {
+            title: t('Cooperation & Promotion'),
+            url: '/cooperation-management',
+            icon: Handshake,
+            badge:
+              cooperationPending > 0 ? String(cooperationPending) : undefined,
             badgeTone: 'danger',
           },
           {

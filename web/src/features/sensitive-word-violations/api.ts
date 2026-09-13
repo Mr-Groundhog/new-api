@@ -76,7 +76,6 @@ export async function getSensitiveWordViolations(
   }
 }
 
-
 export async function getSensitiveWordViolationUsers(
   page: number,
   pageSize: number,
@@ -92,13 +91,19 @@ export async function getSensitiveWordViolationUsers(
   }
 }
 
-export async function deleteSensitiveWordViolations(input: { ids: number[]; days?: number; beforeTime?: number }) {
+export async function deleteSensitiveWordViolations(input: {
+  ids: number[]
+  days?: number
+  beforeTime?: number
+}) {
   const res = await api.post<{
     data: { deleted: number }
   }>('/api/sensitive-word-violations/delete', {
     ids: input.ids,
     ...(input.days !== undefined ? { days: input.days } : {}),
-    ...(input.beforeTime !== undefined ? { before_time: input.beforeTime } : {}),
+    ...(input.beforeTime !== undefined
+      ? { before_time: input.beforeTime }
+      : {}),
   })
   return res.data.data
 }
@@ -226,7 +231,9 @@ export async function deleteProbeGuardLogs(input: {
   }>('/api/probe-guard/delete', {
     ids: input.ids ?? [],
     ...(input.days !== undefined ? { days: input.days } : {}),
-    ...(input.beforeTime !== undefined ? { before_time: input.beforeTime } : {}),
+    ...(input.beforeTime !== undefined
+      ? { before_time: input.beforeTime }
+      : {}),
     ...(input.action !== undefined ? { action: input.action } : {}),
   })
   return res.data.data

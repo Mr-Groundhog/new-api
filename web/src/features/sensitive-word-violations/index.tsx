@@ -29,13 +29,21 @@ export function RiskControlCenter() {
   const { t } = useTranslation()
   return (
     <SectionPageLayout fixedContent>
-      <SectionPageLayout.Title>{t('Risk Control Center')}</SectionPageLayout.Title>
+      <SectionPageLayout.Title>
+        {t('Risk Control Center')}
+      </SectionPageLayout.Title>
       <SectionPageLayout.Content>
         <Tabs className='h-full min-h-0' defaultValue='sensitive-word-triggers'>
-          <TabsList className='group-data-horizontal/tabs:h-auto max-w-full flex-wrap justify-start'>
-            <TabsTrigger value='sensitive-word-triggers'>{t('Sensitive Word Triggers')}</TabsTrigger>
-            <TabsTrigger value='liveness-check-list'>{t('Liveness Check List')}</TabsTrigger>
-            <TabsTrigger value='token-distribution'>{t('Suspected Distribution Users')}</TabsTrigger>
+          <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
+            <TabsTrigger value='sensitive-word-triggers'>
+              {t('Sensitive Word Triggers')}
+            </TabsTrigger>
+            <TabsTrigger value='liveness-check-list'>
+              {t('Liveness Check List')}
+            </TabsTrigger>
+            <TabsTrigger value='token-distribution'>
+              {t('Suspected Distribution Users')}
+            </TabsTrigger>
           </TabsList>
           <TabsContent className='min-h-0' value='sensitive-word-triggers'>
             <SensitiveWordTriggersTab />

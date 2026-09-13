@@ -27,6 +27,7 @@ import { HeaderNavigationSection } from '../maintenance/header-navigation-sectio
 import { LotteryPrizesSection } from '../maintenance/lottery-prizes-section'
 import { NoticeSection } from '../maintenance/notice-section'
 import { SidebarModulesSection } from '../maintenance/sidebar-modules-section'
+import { CooperationMethodsSection } from '../maintenance/cooperation-methods-section'
 import type { SiteSettings } from '../types'
 import { createSectionRegistry } from '../utils/section-registry'
 
@@ -88,6 +89,15 @@ const SITE_SECTIONS = [
         />
       )
     },
+  },
+  {
+    id: 'cooperation-methods',
+    titleKey: 'Cooperation Methods',
+    build: (settings: SiteSettings) => (
+      <CooperationMethodsSection
+        initialSerialized={settings.CooperationMethodsAdmin ?? ''}
+      />
+    ),
   },
   {
     id: 'lottery-prizes',

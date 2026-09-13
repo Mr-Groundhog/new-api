@@ -21,5 +21,7 @@ export function TicketTypeLabel(props: TicketTypeLabelProps) {
   if (!config) {
     return <span className='text-muted-foreground text-sm'>-</span>
   }
-  return <span className='text-muted-foreground text-sm'>{t(config.labelKey)}</span>
+  return (
+    <span className='text-muted-foreground text-sm'>{t(config.labelKey)}</span>
+  )
 }

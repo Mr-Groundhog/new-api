@@ -13,6 +13,7 @@ export const TICKET_TYPE = {
   ACCOUNT: 2,
   BILLING: 3,
   OTHER: 4,
+  COOPERATION: 5,
 } as const
 
 export const TICKET_STATUS = {

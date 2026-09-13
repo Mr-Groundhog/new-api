@@ -81,9 +81,7 @@ export function SensitiveWordsSection({
   const autoBanEnabled = form.watch('SensitiveWordAutoBanEnabled')
   const groupOptions = useMemo(
     () =>
-      Array.from(
-        new Set([...(groupsData?.data ?? []), ...excludedGroups])
-      )
+      Array.from(new Set([...(groupsData?.data ?? []), ...excludedGroups]))
         .sort((a, b) => a.localeCompare(b))
         .map((group) => ({ value: group, label: group })),
     [excludedGroups, groupsData?.data]
@@ -94,15 +92,13 @@ export function SensitiveWordsSection({
   }, [defaultValues, form])
 
   const onSubmit = async (values: SensitiveFormValues) => {
-    const updates = Object.entries(values).filter(
-      ([key, value]) => {
-        const defaultValue = defaultValues[key as keyof SensitiveFormValues]
-        if (Array.isArray(value) && Array.isArray(defaultValue)) {
-          return JSON.stringify(value) !== JSON.stringify(defaultValue)
-        }
-        return value !== defaultValue
+    const updates = Object.entries(values).filter(([key, value]) => {
+      const defaultValue = defaultValues[key as keyof SensitiveFormValues]
+      if (Array.isArray(value) && Array.isArray(defaultValue)) {
+        return JSON.stringify(value) !== JSON.stringify(defaultValue)
       }
-    )
+      return value !== defaultValue
+    })
 
     for (const [key, value] of updates) {
       await updateOption.mutateAsync({

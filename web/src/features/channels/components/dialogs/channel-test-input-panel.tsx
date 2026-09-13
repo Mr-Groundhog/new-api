@@ -57,7 +57,9 @@ export function ChannelTestInputPanel(props: ChannelTestInputPanelProps) {
             className='text-muted-foreground size-4 shrink-0'
             aria-hidden='true'
           />
-          <span className='truncate text-sm font-medium'>{t('Test input')}</span>
+          <span className='truncate text-sm font-medium'>
+            {t('Test input')}
+          </span>
           <span className='text-muted-foreground text-xs'>
             ({testInputs.length})
           </span>
@@ -80,7 +82,7 @@ export function ChannelTestInputPanel(props: ChannelTestInputPanelProps) {
               <span className='text-sm font-medium'>
                 {t(input.category)} / {t(input.label)}
               </span>
-              <code className='rounded bg-muted px-1.5 py-1 text-xs break-words whitespace-pre-wrap'>
+              <code className='bg-muted rounded px-1.5 py-1 text-xs break-words whitespace-pre-wrap'>
                 {input.value}
               </code>
             </div>

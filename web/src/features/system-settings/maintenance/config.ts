@@ -27,6 +27,7 @@ export type HeaderNavModulesConfig = {
   pricing: HeaderNavAccessConfig
   rankings: HeaderNavAccessConfig
   lottery: HeaderNavAccessConfig
+  partners: HeaderNavAccessConfig
   docs: boolean
   about: boolean
   [key: string]: boolean | HeaderNavAccessConfig
@@ -54,6 +55,11 @@ export const HEADER_NAV_DEFAULT: HeaderNavModulesConfig = {
     enabled: true,
     requireAuth: true,
   },
+  // 合作站点页默认关闭，需管理员手动开启
+  partners: {
+    enabled: false,
+    requireAuth: false,
+  },
   docs: true,
   about: true,
 }
@@ -80,6 +86,8 @@ export const SIDEBAR_MODULES_DEFAULT: SidebarModulesAdminConfig = {
     security: true,
     welfareAirdrop: true,
     ticket: true,
+    // 合作推广默认关闭，需管理员手动开启
+    cooperation: false,
   },
   admin: {
     enabled: true,
@@ -92,6 +100,8 @@ export const SIDEBAR_MODULES_DEFAULT: SidebarModulesAdminConfig = {
     userRankings: true,
     setting: true,
     subscription: true,
+    // 合作推广审核默认关闭，需管理员手动开启
+    cooperationReview: false,
   },
 }
 
@@ -160,6 +170,7 @@ export function parseHeaderNavModules(
       pricing: { ...base.pricing },
       rankings: { ...base.rankings },
       lottery: { ...base.lottery },
+      partners: { ...base.partners },
     }
 
     Object.entries(parsed).forEach(([key, raw]) => {
@@ -173,6 +184,10 @@ export function parseHeaderNavModules(
       }
       if (key === 'lottery') {
         result.lottery = parseAccessModule(raw, base.lottery)
+        return
+      }
+      if (key === 'partners') {
+        result.partners = parseAccessModule(raw, base.partners)
         return
       }
 

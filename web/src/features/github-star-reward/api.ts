@@ -41,7 +41,7 @@ export type GithubStarAuditLogsQueryParams = {
 
 function requireData<T>(
   response: GithubStarApiResponse<T>,
-  fallback: string,
+  fallback: string
 ): T {
   if (!response.success || response.data === undefined) {
     throw new Error(response.message || fallback)
@@ -50,9 +50,10 @@ function requireData<T>(
 }
 
 export async function getGithubStarRewardStatus(): Promise<GithubStarRewardStatus> {
-  const response = await api.get<
-    GithubStarApiResponse<GithubStarRewardStatus>
-  >('/api/github-star-reward', { skipErrorHandler: true, skipBusinessError: true })
+  const response = await api.get<GithubStarApiResponse<GithubStarRewardStatus>>(
+    '/api/github-star-reward',
+    { skipErrorHandler: true, skipBusinessError: true }
+  )
   return requireData(response.data, 'GITHUB_STAR_REWARD_STATUS_LOAD_FAILED')
 }
 
@@ -60,13 +61,13 @@ export async function claimGithubStarReward(): Promise<GithubStarClaimResult> {
   const response = await api.post<GithubStarApiResponse<GithubStarClaimResult>>(
     '/api/github-star-reward/claim',
     {},
-    { skipErrorHandler: true, skipBusinessError: true },
+    { skipErrorHandler: true, skipBusinessError: true }
   )
   return requireData(response.data, 'GITHUB_STAR_REWARD_CLAIM_FAILED')
 }
 
 export async function getGithubStarRewardClaims(
-  params: GithubStarClaimsQueryParams,
+  params: GithubStarClaimsQueryParams
 ): Promise<GithubStarItemsPage<GithubStarRewardClaim>> {
   const response = await api.get<
     GithubStarApiResponse<GithubStarItemsPage<GithubStarRewardClaim>>
@@ -78,53 +79,55 @@ export async function getGithubStarRewardClaims(
 }
 
 export async function recheckGithubStarRewardClaim(
-  id: number,
+  id: number
 ): Promise<GithubStarRecheckResult> {
-  const response = await api.post<GithubStarApiResponse<GithubStarRecheckResult>>(
+  const response = await api.post<
+    GithubStarApiResponse<GithubStarRecheckResult>
+  >(
     `/api/github-star-reward/admin/claims/${id}/recheck`,
     {},
-    { skipErrorHandler: true, skipBusinessError: true },
+    { skipErrorHandler: true, skipBusinessError: true }
   )
   return requireData(response.data, 'GITHUB_STAR_REWARD_RECHECK_FAILED')
 }
 
 export async function approveGithubStarRewardClaim(
-  id: number,
+  id: number
 ): Promise<GithubStarRewardClaim> {
   const response = await api.post<GithubStarApiResponse<GithubStarRewardClaim>>(
     `/api/github-star-reward/admin/claims/${id}/approve`,
     {},
-    { skipErrorHandler: true, skipBusinessError: true },
+    { skipErrorHandler: true, skipBusinessError: true }
   )
   return requireData(response.data, 'GITHUB_STAR_REWARD_APPROVE_FAILED')
 }
 
 export async function rejectGithubStarRewardClaim(
   id: number,
-  reason: string,
+  reason: string
 ): Promise<GithubStarRewardClaim> {
   const response = await api.post<GithubStarApiResponse<GithubStarRewardClaim>>(
     `/api/github-star-reward/admin/claims/${id}/reject`,
     { reason },
-    { skipErrorHandler: true, skipBusinessError: true },
+    { skipErrorHandler: true, skipBusinessError: true }
   )
   return requireData(response.data, 'GITHUB_STAR_REWARD_REJECT_FAILED')
 }
 
 export async function revokeGithubStarRewardClaim(
   id: number,
-  reason: string,
+  reason: string
 ): Promise<GithubStarRewardClaim> {
   const response = await api.post<GithubStarApiResponse<GithubStarRewardClaim>>(
     `/api/github-star-reward/admin/claims/${id}/revoke`,
     { reason },
-    { skipErrorHandler: true, skipBusinessError: true },
+    { skipErrorHandler: true, skipBusinessError: true }
   )
   return requireData(response.data, 'GITHUB_STAR_REWARD_REVOKE_FAILED')
 }
 
 export async function getGithubStarAuditLogs(
-  params: GithubStarAuditLogsQueryParams,
+  params: GithubStarAuditLogsQueryParams
 ): Promise<GithubStarItemsPage<GithubStarAuditLog>> {
   const response = await api.get<
     GithubStarApiResponse<GithubStarItemsPage<GithubStarAuditLog>>

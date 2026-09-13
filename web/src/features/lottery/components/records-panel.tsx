@@ -6,14 +6,11 @@ it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the License.
 */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Clock01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import { cn } from '@/lib/utils'
-import { toIntlLocale } from '@/i18n/languages'
 
 import {
   Empty,
@@ -23,7 +20,9 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
+import { toIntlLocale } from '@/i18n/languages'
 import { formatQuota } from '@/lib/format'
+import { cn } from '@/lib/utils'
 
 import { getMyLotteryRecords, type LotteryUserDraw } from '../api'
 import { lotteryQueryKeys } from '../constants'
@@ -47,7 +46,13 @@ function formatRecordTime(lang: string, iso: string, withDate: boolean) {
   )
 }
 
-function HistoryRow({ record, lang }: { record: LotteryUserDraw; lang: string }) {
+function HistoryRow({
+  record,
+  lang,
+}: {
+  record: LotteryUserDraw
+  lang: string
+}) {
   return (
     <div className='lottery-record-row'>
       <span className='lottery-record-prize'>
@@ -153,11 +158,7 @@ export function RecordsPanel(props: RecordsPanelProps) {
                   <span className='lottery-record-person'>
                     <strong>{record.displayName}</strong>
                     <small>
-                      {formatRecordTime(
-                        i18n.language,
-                        record.createdAt,
-                        false
-                      )}
+                      {formatRecordTime(i18n.language, record.createdAt, false)}
                     </small>
                   </span>
                   <span className='lottery-record-prize'>
@@ -205,11 +206,7 @@ export function RecordsPanel(props: RecordsPanelProps) {
               )}
             {!historyQuery.isLoading &&
               (historyQuery.data ?? []).map((record, index) => (
-                <HistoryRow
-                  key={index}
-                  record={record}
-                  lang={i18n.language}
-                />
+                <HistoryRow key={index} record={record} lang={i18n.language} />
               ))}
           </>
         )}

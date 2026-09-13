@@ -8,6 +8,7 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Check,
   Clock,
@@ -19,9 +20,14 @@ import {
   Sparkles,
   TicketCheck,
 } from 'lucide-react'
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { SectionPageLayout } from '@/components/layout'
@@ -45,12 +51,13 @@ import {
   welfareAirdropQueryKeys,
 } from './api'
 import type { WelfareAirdrop, WelfareAirdropClaim } from './types'
+
 import './welfare-airdrop.css'
 
 function AirdropOrb() {
   return (
-    <div className="airdrop-orb" aria-hidden="true">
-      <div className="airdrop-orb-core">
+    <div className='airdrop-orb' aria-hidden='true'>
+      <div className='airdrop-orb-core'>
         <Gift />
       </div>
       <i />
@@ -81,12 +88,13 @@ function AirdropConverge() {
         delay: (Math.random() * 0.35).toFixed(3),
         duration: (0.65 + Math.random() * 0.5).toFixed(3),
         width: 12 + Math.round(Math.random() * 14),
-        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        color:
+          CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       })),
-    [],
+    []
   )
   return (
-    <div className="airdrop-converge" aria-hidden="true">
+    <div className='airdrop-converge' aria-hidden='true'>
       {streaks.map((streak) => (
         <span
           key={streak.id}
@@ -121,16 +129,17 @@ function AirdropConfetti() {
           rot: Math.round((Math.random() - 0.5) * 900),
           delay: (Math.random() * 0.25).toFixed(3),
           duration: (2.4 + Math.random() * 1.3).toFixed(3),
-          color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+          color:
+            CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
           width: 5 + Math.round(Math.random() * 7),
           height: 8 + Math.round(Math.random() * 9),
           round: Math.random() > 0.62,
         }
       }),
-    [],
+    []
   )
   return (
-    <div className="airdrop-confetti" aria-hidden="true">
+    <div className='airdrop-confetti' aria-hidden='true'>
       {pieces.map((piece) => (
         <span
           key={piece.id}
@@ -186,7 +195,7 @@ function CampaignCard({
     ? 0
     : Math.min(
         100,
-        (campaign.claimedCount / Math.max(campaign.totalCount, 1)) * 100,
+        (campaign.claimedCount / Math.max(campaign.totalCount, 1)) * 100
       )
   const status = t(stateLabels[campaign.state])
   let claimLabel = status
@@ -197,27 +206,34 @@ function CampaignCard({
   } else if (campaign.canClaim) {
     claimLabel = t('Claim credit')
   }
-  let claimIcon = <Sparkles aria-hidden="true" />
+  let claimIcon = <Sparkles aria-hidden='true' />
   if (pending) {
-    claimIcon = <LoaderCircle className="animate-spin" aria-hidden="true" />
+    claimIcon = <LoaderCircle className='animate-spin' aria-hidden='true' />
   } else if (celebrating) {
     claimIcon = (
       <>
-        <Check className="airdrop-claim-success-icon" aria-hidden="true" />
-        <span className="airdrop-claim-burst" aria-hidden="true"><i /><i /><i /><i /></span>
+        <Check className='airdrop-claim-success-icon' aria-hidden='true' />
+        <span className='airdrop-claim-burst' aria-hidden='true'>
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
       </>
     )
   }
   return (
-    <article className={`airdrop-glow airdrop-enter h-full flex flex-col overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 via-background to-violet-500/10 transition-transform duration-300 hover:-translate-y-1 ${celebrating ? 'airdrop-card-celebrating' : ''}`}>
-      <div className="flex items-start justify-between gap-4 p-5 pb-0">
-        <div className="flex gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.15)]">
-            <Gift className="size-5" aria-hidden="true" />
+    <article
+      className={`airdrop-glow airdrop-enter via-background flex h-full flex-col overflow-hidden rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 transition-transform duration-300 hover:-translate-y-1 ${celebrating ? 'airdrop-card-celebrating' : ''}`}
+    >
+      <div className='flex items-start justify-between gap-4 p-5 pb-0'>
+        <div className='flex gap-3'>
+          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.15)]'>
+            <Gift className='size-5' aria-hidden='true' />
           </div>
           <div>
-            <h2 className="leading-tight font-semibold">{campaign.name}</h2>
-            <p className="text-muted-foreground mt-1 line-clamp-2 text-sm leading-relaxed">
+            <h2 className='leading-tight font-semibold'>{campaign.name}</h2>
+            <p className='text-muted-foreground mt-1 line-clamp-2 text-sm leading-relaxed'>
               {campaign.description ||
                 t('A little extra credit, right when you need it.')}
             </p>
@@ -226,33 +242,33 @@ function CampaignCard({
         <Badge className={stateBadgeClass[campaign.state]}>{status}</Badge>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 p-5">
-        <div className="rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]">
-          <span className="text-muted-foreground flex items-center gap-1 text-xs">
-            <TicketCheck className="size-3.5" aria-hidden="true" />
+      <div className='grid grid-cols-3 gap-3 p-5'>
+        <div className='rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]'>
+          <span className='text-muted-foreground flex items-center gap-1 text-xs'>
+            <TicketCheck className='size-3.5' aria-hidden='true' />
             {t('Credit per claim')}
           </span>
-          <strong className="mt-1.5 block font-mono text-lg text-cyan-500 dark:text-cyan-400">
+          <strong className='mt-1.5 block font-mono text-lg text-cyan-500 dark:text-cyan-400'>
             {formatQuota(campaign.quota)}
           </strong>
         </div>
-        <div className="rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]">
-          <span className="text-muted-foreground flex items-center gap-1 text-xs">
-            <Package className="size-3.5" aria-hidden="true" />
+        <div className='rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]'>
+          <span className='text-muted-foreground flex items-center gap-1 text-xs'>
+            <Package className='size-3.5' aria-hidden='true' />
             {t('Available stock')}
           </span>
-          <strong className="mt-1.5 block font-mono text-lg">
+          <strong className='mt-1.5 block font-mono text-lg'>
             {campaign.unlimited
               ? t('Unlimited')
               : `${campaign.remaining} / ${campaign.totalCount}`}
           </strong>
         </div>
-        <div className="rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]">
-          <span className="text-muted-foreground flex items-center gap-1 text-xs">
-            <Clock className="size-3.5" aria-hidden="true" />
+        <div className='rounded-lg border bg-black/[0.02] p-3 dark:bg-white/[0.02]'>
+          <span className='text-muted-foreground flex items-center gap-1 text-xs'>
+            <Clock className='size-3.5' aria-hidden='true' />
             {t('Expiration time')}
           </span>
-          <strong className="mt-1.5 block text-lg">
+          <strong className='mt-1.5 block text-lg'>
             {campaign.endTime
               ? formatTimestampToDate(campaign.endTime)
               : t('No expiry')}
@@ -260,23 +276,23 @@ function CampaignCard({
         </div>
       </div>
 
-      <div className="mt-auto px-5 pb-5">
+      <div className='mt-auto px-5 pb-5'>
         {!campaign.unlimited && (
           <div
-            className="mb-4 h-1.5 overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]"
-            role="progressbar"
+            className='mb-4 h-1.5 overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]'
+            role='progressbar'
             aria-valuenow={Math.round(progress)}
             aria-valuemin={0}
             aria-valuemax={100}
           >
             <span
-              className="airdrop-progress-shine block h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-[width] duration-500"
+              className='airdrop-progress-shine block h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-[width] duration-500'
               style={{ width: `${progress}%` }}
             />
           </div>
         )}
         <Button
-          className={`h-11 w-full rounded-full border-0 bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-[0_8px_24px_-8px_rgba(34,211,238,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-8px_rgba(139,92,246,0.55)] hover:from-cyan-400 hover:to-violet-400 disabled:opacity-50 ${pending ? 'airdrop-claim-charging' : ''} ${celebrating ? 'airdrop-claim-success' : ''}`}
+          className={`h-11 w-full rounded-full border-0 bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-[0_8px_24px_-8px_rgba(34,211,238,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:from-cyan-400 hover:to-violet-400 hover:shadow-[0_14px_32px_-8px_rgba(139,92,246,0.55)] disabled:opacity-50 ${pending ? 'airdrop-claim-charging' : ''} ${celebrating ? 'airdrop-claim-success' : ''}`}
           disabled={!campaign.canClaim || pending || celebrating}
           onClick={onClaim}
         >
@@ -293,31 +309,31 @@ function ClaimRecord({ claim }: { claim: WelfareAirdropClaim }) {
   const { copyToClipboard, copiedText } = useCopyToClipboard()
   const copied = copiedText === claim.redemptionKey
   return (
-    <div className="flex flex-col gap-3 border-b py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-w-0">
-        <p className="truncate font-medium">{claim.airdropName}</p>
-        <p className="text-muted-foreground mt-0.5 text-xs">
+    <div className='flex flex-col gap-3 border-b py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='min-w-0'>
+        <p className='truncate font-medium'>{claim.airdropName}</p>
+        <p className='text-muted-foreground mt-0.5 text-xs'>
           {formatTimestampToDate(claim.createdTime)} ·{' '}
           {t('Successfully received {{quota}} credit', {
             quota: formatQuota(claim.quota),
           })}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        <code className="truncate rounded-md border bg-black/[0.03] px-2.5 py-1.5 font-mono text-xs dark:bg-white/[0.03]">
+      <div className='flex shrink-0 items-center gap-2'>
+        <code className='truncate rounded-md border bg-black/[0.03] px-2.5 py-1.5 font-mono text-xs dark:bg-white/[0.03]'>
           {claim.redemptionKey}
         </code>
         <Button
-          type="button"
-          variant="outline"
-          size="icon"
+          type='button'
+          variant='outline'
+          size='icon'
           aria-label={t('Copy')}
           onClick={() => void copyToClipboard(claim.redemptionKey)}
         >
           {copied ? (
-            <Check className="text-cyan-500" aria-hidden="true" />
+            <Check className='text-cyan-500' aria-hidden='true' />
           ) : (
-            <Copy aria-hidden="true" />
+            <Copy aria-hidden='true' />
           )}
         </Button>
       </div>
@@ -375,17 +391,17 @@ export function WelfareAirdrop() {
   let campaignSection: ReactNode
   if (query.isLoading) {
     campaignSection = (
-      <div className="text-cyan-500 flex justify-center py-16">
-        <LoaderCircle className="size-8 animate-spin" aria-hidden="true" />
+      <div className='flex justify-center py-16 text-cyan-500'>
+        <LoaderCircle className='size-8 animate-spin' aria-hidden='true' />
       </div>
     )
   } else if (campaigns.length === 0) {
     campaignSection = (
-      <div className="flex flex-col items-center gap-6 rounded-xl border border-dashed px-6 py-12 text-center">
+      <div className='flex flex-col items-center gap-6 rounded-xl border border-dashed px-6 py-12 text-center'>
         <AirdropOrb />
-        <p className="text-muted-foreground max-w-md">
+        <p className='text-muted-foreground max-w-md'>
           {t(
-            'The next welfare drop is being prepared. Stay tuned for the launch signal.',
+            'The next welfare drop is being prepared. Stay tuned for the launch signal.'
           )}
         </p>
       </div>
@@ -393,7 +409,7 @@ export function WelfareAirdrop() {
   } else {
     campaignSection = (
       <Carousel
-        className="airdrop-enter w-full"
+        className='airdrop-enter w-full'
         opts={{ loop: campaigns.length > 1 }}
       >
         <CarouselContent>
@@ -410,8 +426,8 @@ export function WelfareAirdrop() {
         </CarouselContent>
         {campaigns.length > 1 && (
           <>
-            <CarouselPrevious className="-left-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-left-6" />
-            <CarouselNext className="-right-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-right-6" />
+            <CarouselPrevious className='-left-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-left-6' />
+            <CarouselNext className='-right-3 border-cyan-500/30 hover:bg-cyan-500/10 sm:-right-6' />
           </>
         )}
       </Carousel>
@@ -421,13 +437,13 @@ export function WelfareAirdrop() {
   let claimsList: ReactNode
   if (claimsQuery.isLoading) {
     claimsList = (
-      <div className="text-muted-foreground flex justify-center py-8">
-        <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
+      <div className='text-muted-foreground flex justify-center py-8'>
+        <LoaderCircle className='size-6 animate-spin' aria-hidden='true' />
       </div>
     )
   } else if (claims.length === 0) {
     claimsList = (
-      <p className="text-muted-foreground py-8 text-center text-sm">
+      <p className='text-muted-foreground py-8 text-center text-sm'>
         {t('No claim records yet')}
       </p>
     )
@@ -440,7 +456,7 @@ export function WelfareAirdrop() {
   return (
     <SectionPageLayout>
       <SectionPageLayout.Title>
-        <span className="inline-flex items-center gap-2">
+        <span className='inline-flex items-center gap-2'>
           <span>{t('Welfare Airdrop')}</span>
           <Badge>{t('Limited time')}</Badge>
         </span>
@@ -448,8 +464,8 @@ export function WelfareAirdrop() {
       <SectionPageLayout.Actions>
         <GithubStarRewardEntry />
         <Button
-          variant="outline"
-          size="sm"
+          variant='outline'
+          size='sm'
           onClick={() => {
             void query.refetch()
             void claimsQuery.refetch()
@@ -468,13 +484,13 @@ export function WelfareAirdrop() {
             <AirdropConverge />
             <AirdropConfetti />
             <div
-              className="airdrop-success-overlay"
-              role="status"
-              aria-live="polite"
+              className='airdrop-success-overlay'
+              role='status'
+              aria-live='polite'
             >
-              <span className="airdrop-success-halo" aria-hidden="true" />
-              <span className="airdrop-success-shockwave" aria-hidden="true" />
-              <div className="airdrop-success-rays" aria-hidden="true">
+              <span className='airdrop-success-halo' aria-hidden='true' />
+              <span className='airdrop-success-shockwave' aria-hidden='true' />
+              <div className='airdrop-success-rays' aria-hidden='true'>
                 <i />
                 <i />
                 <i />
@@ -482,32 +498,32 @@ export function WelfareAirdrop() {
                 <i />
                 <i />
               </div>
-              <div className="airdrop-success-badge" aria-hidden="true">
+              <div className='airdrop-success-badge' aria-hidden='true'>
                 <Check />
               </div>
-              <div className="airdrop-success-copy">
+              <div className='airdrop-success-copy'>
                 <strong>
                   {t(
                     'Successfully received {{quota}} credit, added to your wallet',
-                    { quota: formatQuota(celebrationQuota) },
+                    { quota: formatQuota(celebrationQuota) }
                   )}
                 </strong>
               </div>
             </div>
           </>
         )}
-        <div className="mx-auto w-full max-w-5xl space-y-6 py-2">
+        <div className='mx-auto w-full max-w-5xl space-y-6 py-2'>
           {campaignSection}
 
-          <section className="airdrop-enter airdrop-enter-3 rounded-xl border">
-            <h2 className="flex items-center gap-2 border-b px-5 py-4 font-semibold">
+          <section className='airdrop-enter airdrop-enter-3 rounded-xl border'>
+            <h2 className='flex items-center gap-2 border-b px-5 py-4 font-semibold'>
               <TicketCheck
-                className="size-4 text-cyan-500"
-                aria-hidden="true"
+                className='size-4 text-cyan-500'
+                aria-hidden='true'
               />
               {t('Claim records')}
             </h2>
-            <div className="px-5 py-1">{claimsList}</div>
+            <div className='px-5 py-1'>{claimsList}</div>
           </section>
         </div>
       </SectionPageLayout.Content>

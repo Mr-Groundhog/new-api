@@ -87,7 +87,9 @@ export function BanByConditionDialog() {
       if (result.success) {
         const banned = (result.data?.banned ?? 0) as number
         if (banned > 0) {
-          toast.success(t('{{count}} user(s) banned successfully', { count: banned }))
+          toast.success(
+            t('{{count}} user(s) banned successfully', { count: banned })
+          )
         } else {
           toast.info(t('No users matched the condition'))
         }
@@ -112,7 +114,7 @@ export function BanByConditionDialog() {
           <DialogTitle>{t('Conditional Ban')}</DialogTitle>
           <DialogDescription>
             {t(
-              'Banned users will be disabled immediately and their sessions and tokens will be invalidated.',
+              'Banned users will be disabled immediately and their sessions and tokens will be invalidated.'
             )}
           </DialogDescription>
         </DialogHeader>
@@ -138,7 +140,9 @@ export function BanByConditionDialog() {
                 <SelectItem value='last_login'>
                   {t('Last login time')}
                 </SelectItem>
-                <SelectItem value='last_call'>{t('Last API call time')}</SelectItem>
+                <SelectItem value='last_call'>
+                  {t('Last API call time')}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

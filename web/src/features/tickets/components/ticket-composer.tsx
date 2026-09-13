@@ -47,10 +47,7 @@ export function TicketComposer(props: TicketComposerProps) {
     <div className='flex flex-col gap-2'>
       <div className='flex items-center justify-between'>
         <span className='text-sm font-medium'>{props.label}</span>
-        <span
-          className='text-muted-foreground text-xs'
-          aria-live='polite'
-        >
+        <span className='text-muted-foreground text-xs' aria-live='polite'>
           {t('{{current}} / {{max}}', {
             current: runeLength(content),
             max: TICKET_VALIDATION.CONTENT_MAX_LENGTH,

@@ -71,6 +71,14 @@ var auditContentTemplates = map[string]string{
 	"lottery.draw": "Won the lottery prize ${prize} (quota +${quota})",
 
 	"github_star.revoke": "Revoked GitHub Star reward claim #${claim_id} (quota -${quota}, reason: ${reason})",
+
+	"cooperation.approve": "Approved cooperation application #${id} from user ${username} (site: ${site_name})",
+	"cooperation.reject":  "Rejected cooperation application #${id} from user ${username} (site: ${site_name})",
+	"cooperation.delete":  "Deleted cooperation application #${id} of user ${username} (site: ${site_name})",
+
+	"cooperation_site.create": "Created cooperation site ${name} (ID: ${id})",
+	"cooperation_site.update": "Updated cooperation site ${name} (ID: ${id})",
+	"cooperation_site.delete": "Deleted cooperation site ${name} (ID: ${id})",
 }
 
 // auditContentEN 按 action 模板渲染英文兜底文本；未登记的 action 退回 action 本身。

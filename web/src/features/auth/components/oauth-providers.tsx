@@ -26,12 +26,12 @@ import {
   IconTelegram,
   IconWeChat,
 } from '@/assets/brand-icons'
+import { Button } from '@/components/ui/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 import { useOAuthLogin } from '../hooks/use-oauth-login'
@@ -185,13 +185,7 @@ export function OAuthProviders({
 
         <div className='flex flex-row flex-wrap justify-center gap-2'>
           {providerButtons.map(
-            ({
-              key,
-              name,
-              onClick,
-              icon,
-              disabled: extraDisabled,
-            }) => {
+            ({ key, name, onClick, icon, disabled: extraDisabled }) => {
               const button = (
                 <Button
                   key={key}
@@ -208,7 +202,11 @@ export function OAuthProviders({
                   onClick={onClick}
                   className='h-11 w-11 justify-center rounded-lg p-0'
                 >
-                  {icon ?? <span className='text-sm font-medium'>{name.charAt(0)}</span>}
+                  {icon ?? (
+                    <span className='text-sm font-medium'>
+                      {name.charAt(0)}
+                    </span>
+                  )}
                 </Button>
               )
               return (

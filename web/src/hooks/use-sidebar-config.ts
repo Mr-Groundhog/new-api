@@ -58,6 +58,8 @@ const DEFAULT_SIDEBAR_MODULES: SidebarModulesAdminConfig = {
     security: true,
     welfareAirdrop: true,
     ticket: true,
+    // 合作推广默认关闭，需管理员手动开启（服务端 gate 用 DefaultClosed 判定）
+    cooperation: false,
   },
   admin: {
     enabled: true,
@@ -70,6 +72,7 @@ const DEFAULT_SIDEBAR_MODULES: SidebarModulesAdminConfig = {
     userRankings: true,
     setting: true,
     subscription: true,
+    cooperationReview: false,
   },
 }
 
@@ -116,6 +119,8 @@ const URL_TO_CONFIG_MAP: Record<string, { section: string; module: string }> = {
   '/welfare-airdrop': { section: 'personal', module: 'welfareAirdrop' },
   '/tickets': { section: 'personal', module: 'ticket' },
   '/ticket-management': { section: 'admin', module: 'ticket' },
+  '/cooperation': { section: 'personal', module: 'cooperation' },
+  '/cooperation-management': { section: 'admin', module: 'cooperationReview' },
   '/wallet': { section: 'personal', module: 'topup' },
   '/profile': { section: 'personal', module: 'personal' },
   '/security': { section: 'personal', module: 'security' },

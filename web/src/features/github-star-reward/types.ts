@@ -8,7 +8,11 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-export type GithubStarClaimStatus = 'pending' | 'granted' | 'rejected' | 'revoked'
+export type GithubStarClaimStatus =
+  | 'pending'
+  | 'granted'
+  | 'rejected'
+  | 'revoked'
 
 export type GithubStarRewardClaim = {
   id: number

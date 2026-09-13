@@ -16,6 +16,7 @@ import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { formatQuota } from '@/lib/format'
 
 import {
   drawLottery,
@@ -26,9 +27,6 @@ import {
 import { LotteryBoard } from './components/lottery-board'
 import { RecordsPanel } from './components/records-panel'
 import { ResultDialog } from './components/result-dialog'
-
-import { formatQuota } from '@/lib/format'
-
 import { lotteryQueryKeys } from './constants'
 import { getLotteryErrorKey, getLotteryStepDelay } from './lib'
 import type { LotteryDrawResult } from './types'
@@ -120,16 +118,10 @@ export function Lottery() {
         <PageTransition className='lottery-page-inner'>
           <div className='lottery-page-heading'>
             <div>
-              <span className='lottery-kicker'>
-                {t("Today's lucky stage")}
-              </span>
-              <h2 id='lottery-stage-title'>
-                {t('Take your luck with you')}
-              </h2>
+              <span className='lottery-kicker'>{t("Today's lucky stage")}</span>
+              <h2 id='lottery-stage-title'>{t('Take your luck with you')}</h2>
             </div>
-            <Badge
-              variant={drawMutation.isPending ? 'default' : 'outline'}
-            >
+            <Badge variant={drawMutation.isPending ? 'default' : 'outline'}>
               {drawMutation.isPending
                 ? t('Drawing')
                 : myDraw
@@ -154,7 +146,8 @@ export function Lottery() {
                 drawn={drawn}
                 remaining={remaining}
                 onDraw={() => {
-                  if (drawRequestActive.current || drawn || remaining <= 0) return
+                  if (drawRequestActive.current || drawn || remaining <= 0)
+                    return
                   drawRequestActive.current = true
                   setResult(null)
                   setNoticeKey('The result is being sealed. Please wait.')

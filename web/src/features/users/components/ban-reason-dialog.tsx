@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -60,9 +60,7 @@ export function BanReasonDialog({
 
   const handleConfirm = async () => {
     const reason =
-      reasonType === USER_BAN_REASONS.CUSTOM
-        ? customReason.trim()
-        : reasonType
+      reasonType === USER_BAN_REASONS.CUSTOM ? customReason.trim() : reasonType
     if (!reason) return
     setIsSubmitting(true)
     try {

@@ -14,18 +14,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+import { CalendarCheck, Radio, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StatusBadge } from '@/components/status-badge'
 import { Dialog } from '@/components/dialog'
-import { useStatus } from '@/hooks/use-status'
-import type { BroadcastItem } from '@/features/dashboard/types'
+import { RichContent } from '@/components/rich-content'
+import { StatusBadge } from '@/components/status-badge'
 import type { SystemStatus } from '@/features/auth/types'
+import { getPreviewText } from '@/features/dashboard/lib'
+import type { BroadcastItem } from '@/features/dashboard/types'
+import { useStatus } from '@/hooks/use-status'
 import dayjs from '@/lib/dayjs'
 import { cn } from '@/lib/utils'
-
-import { CalendarCheck, Radio, X } from 'lucide-react'
 
 // localStorage key for the "Close Today" date (YYYY-MM-DD); stored per browser.
 const DISMISSED_TODAY_KEY = 'global_broadcast_dismissed_date'
@@ -122,10 +123,13 @@ function BroadcastLine({
       <span
         className={`h-2 w-2 shrink-0 self-center rounded-full ${dotColorMap[item.type ?? 'default']}`}
       />
-      <div ref={viewportRef} className='relative flex flex-1 items-center overflow-hidden'>
+      <div
+        ref={viewportRef}
+        className='relative flex flex-1 items-center overflow-hidden'
+      >
         <span
           ref={textRef}
-          className={`inline-block whitespace-nowrap text-xs font-medium leading-none text-amber-900 dark:text-amber-100 ${
+          className={`inline-block text-xs leading-none font-medium whitespace-nowrap text-amber-900 dark:text-amber-100 ${
             scroll ? 'broadcast-text-scroll' : ''
           }`}
           style={
@@ -137,7 +141,9 @@ function BroadcastLine({
               : undefined
           }
         >
-          {item.content}
+          {/* Single-line marquee: strip Markdown/HTML to plain text; the full
+              rendered content is available in the dialog below. */}
+          {getPreviewText(item.content, Number.MAX_SAFE_INTEGER)}
         </span>
       </div>
     </button>
@@ -223,7 +229,7 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
           type='button'
           aria-label={t('Global Broadcast')}
           onClick={() => setOpen(true)}
-          className='flex size-8 shrink-0 items-center justify-center rounded-full text-amber-600 transition hover:bg-accent md:hidden dark:text-amber-400'
+          className='hover:bg-accent flex size-8 shrink-0 items-center justify-center rounded-full text-amber-600 transition md:hidden dark:text-amber-400'
         >
           <Radio className='h-4 w-4 animate-pulse' />
         </button>
@@ -240,7 +246,11 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
             <Radio className='h-4 w-4 animate-pulse' />
           </span>
           <div className='relative min-w-0 flex-1'>
-            <BroadcastLine key={activeIndex} item={active} onOpen={() => setOpen(true)} />
+            <BroadcastLine
+              key={activeIndex}
+              item={active}
+              onOpen={() => setOpen(true)}
+            />
           </div>
         </div>
       </div>
@@ -258,7 +268,7 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
             <button
               type='button'
               onClick={closeForToday}
-              className='inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted'
+              className='border-border text-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium transition'
             >
               <CalendarCheck className='h-4 w-4' />
               {t('Dismiss for Today')}
@@ -266,7 +276,7 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
             <button
               type='button'
               onClick={() => handleOpenChange(false)}
-              className='inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90'
+              className='bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition hover:opacity-90'
             >
               <X className='h-4 w-4' />
               {t('I Acknowledge')}
@@ -277,7 +287,7 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
         {broadcasts.map((b, i) => (
           <div
             key={b.id ?? i}
-            className='flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-3'
+            className='border-border bg-muted/40 flex items-start gap-3 rounded-lg border p-3'
           >
             <span
               className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${accent}`}
@@ -290,13 +300,13 @@ export function GlobalBroadcast(props: GlobalBroadcastProps) {
                   copyable={false}
                 />
               </div>
-              <p className='text-sm leading-relaxed text-foreground'>
-                {b.content}
-              </p>
+              <div className='text-sm'>
+                <RichContent breaks content={b.content} />
+              </div>
               {b.extra ? (
-                <p className='text-muted-foreground text-xs leading-relaxed'>
-                  {b.extra}
-                </p>
+                <div className='text-muted-foreground text-xs'>
+                  <RichContent breaks content={b.extra} />
+                </div>
               ) : null}
             </div>
           </div>

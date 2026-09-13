@@ -10,12 +10,12 @@ the Free Software Foundation, either version 3 of the License, or
 import type { TFunction } from 'i18next'
 import { z } from 'zod'
 
-import { TICKET_TYPE } from '../types'
 import {
   TICKET_TYPE_VALUES,
   TICKET_VALIDATION,
   getTicketFormErrorMessages,
 } from '../constants'
+import { TICKET_TYPE } from '../types'
 
 /** 与后端 utf8.RuneCountInString 一致：按 Unicode 码点计数而非 UTF-16 code unit。 */
 export const runeLength = (value: string) => [...value].length
@@ -37,7 +37,8 @@ export function getTicketFormSchema(t: TFunction) {
       .trim()
       .refine(
         (v) =>
-          runeLength(v) >= 1 && runeLength(v) <= TICKET_VALIDATION.TITLE_MAX_LENGTH,
+          runeLength(v) >= 1 &&
+          runeLength(v) <= TICKET_VALIDATION.TITLE_MAX_LENGTH,
         msg.TITLE_LENGTH
       ),
     content: z

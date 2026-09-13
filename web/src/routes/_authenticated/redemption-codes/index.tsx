@@ -33,10 +33,7 @@ const redemptionsSearchSchema = z.object({
   rc_page: z.number().optional().catch(1),
   rc_pageSize: z.number().optional().catch(10),
   rc_filter: z.string().optional().catch(''),
-  rc_status: z
-    .array(z.enum(REGISTRATION_FILTER_VALUES))
-    .optional()
-    .catch([]),
+  rc_status: z.array(z.enum(REGISTRATION_FILTER_VALUES)).optional().catch([]),
 })
 
 export const Route = createFileRoute('/_authenticated/redemption-codes/')({

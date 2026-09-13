@@ -8,9 +8,9 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { Link } from '@tanstack/react-router'
 import { ExternalLink, LoaderCircle, RotateCw, Star } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { ConfirmDialog } from '@/components/confirm-dialog'
@@ -63,7 +63,7 @@ export function RewardCard(props: {
               title={t('Re-apply for the reward')}
               desc={t(
                 'Please confirm that you have starred the repository {{repository}}. If you starred it just now, detection may take a few minutes to catch up — wait a while before retrying.',
-                { repository: props.status.repository ?? '' },
+                { repository: props.status.repository ?? '' }
               )}
               confirmText={t('Confirm and re-apply')}
               isLoading={props.pending}

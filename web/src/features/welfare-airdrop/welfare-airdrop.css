@@ -32,12 +32,18 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-glow::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(120deg, #22d3ee66, transparent 35%, transparent 65%, #a78bfa66);
+  background: linear-gradient(
+    120deg,
+    #22d3ee66,
+    transparent 35%,
+    transparent 65%,
+    #a78bfa66
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -54,10 +60,15 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-progress-shine::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 0.55) 50%, transparent 80%);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.55) 50%,
+    transparent 80%
+  );
   transform: translateX(-100%);
   animation: airdrop-shine 2.2s ease-in-out infinite;
 }
@@ -70,7 +81,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-claim-charging::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -89,12 +100,16 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-card-celebrating::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  background: radial-gradient(circle at 50% 82%, rgb(52 211 153 / 0.22), transparent 48%);
+  background: radial-gradient(
+    circle at 50% 82%,
+    rgb(52 211 153 / 0.22),
+    transparent 48%
+  );
   opacity: 0;
   pointer-events: none;
   animation: airdrop-card-flash 1.9s ease-out both;
@@ -115,11 +130,16 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-claim-success::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: -60% -20%;
   z-index: 0;
-  background: linear-gradient(100deg, transparent 38%, rgb(255 255 255 / 0.6) 50%, transparent 62%);
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgb(255 255 255 / 0.6) 50%,
+    transparent 62%
+  );
   transform: translateX(-70%);
   animation: airdrop-success-sweep 1.5s ease-out 0.15s both;
 }
@@ -248,10 +268,7 @@ For commercial licensing, please contact support@quantumnous.com
   }
   42% {
     opacity: 1;
-    transform: translate(
-        calc(-50% + var(--tx)),
-        calc(-50% + var(--ty))
-      )
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)))
       scale(1) rotate(calc(var(--rot) * 0.5));
   }
   100% {
@@ -294,7 +311,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-success-overlay::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -315,7 +332,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 /* ---- 旋转流光边框 ---- */
 @property --airdrop-angle {
-  syntax: "<angle>";
+  syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
@@ -346,7 +363,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-success-overlay::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -14px;
   z-index: -1;
@@ -373,7 +390,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-success-badge::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -384,7 +401,7 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .airdrop-success-badge::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -8px;
   z-index: -1;
@@ -513,7 +530,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 .airdrop-orb::before,
 .airdrop-orb::after {
-  content: "";
+  content: '';
   position: absolute;
   border-radius: 50%;
   border: 1px solid #22d3ee55;
@@ -580,7 +597,6 @@ For commercial licensing, please contact support@quantumnous.com
   animation: airdrop-orbit 5s linear infinite;
   animation-delay: -3.2s;
 }
-
 
 @keyframes airdrop-rise {
   from {

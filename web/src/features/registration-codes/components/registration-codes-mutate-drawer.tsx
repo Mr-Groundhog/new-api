@@ -132,9 +132,7 @@ export function RegistrationCodesMutateDrawer({
         }
       }}
     >
-      <SheetContent
-        className={sideDrawerContentClassName('sm:max-w-[600px]')}
-      >
+      <SheetContent className={sideDrawerContentClassName('sm:max-w-[600px]')}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>{t('Update Registration Code')}</SheetTitle>
           <SheetDescription>
@@ -157,15 +155,10 @@ export function RegistrationCodesMutateDrawer({
                     <FormItem>
                       <FormLabel>{t('Name')}</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder={t('Enter a name')}
-                        />
+                        <Input {...field} placeholder={t('Enter a name')} />
                       </FormControl>
                       <FormDescription>
-                        {t(
-                          'Name for this registration code (1-20 characters)'
-                        )}
+                        {t('Name for this registration code (1-20 characters)')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -228,7 +221,6 @@ export function RegistrationCodesMutateDrawer({
                     </FormItem>
                   )}
                 />
-
               </SideDrawerSection>
             </fieldset>
           </form>

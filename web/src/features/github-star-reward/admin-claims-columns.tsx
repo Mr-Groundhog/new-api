@@ -107,7 +107,7 @@ export function useGithubStarClaimsColumns(): ColumnDef<GithubStarRewardClaim>[]
       accessorKey: 'granted_at',
       header: t('Granted at'),
       cell: ({ row }) => (
-        <span className='text-muted-foreground whitespace-nowrap text-xs'>
+        <span className='text-muted-foreground text-xs whitespace-nowrap'>
           {formatTimestampToDate(row.getValue('granted_at') as number)}
         </span>
       ),

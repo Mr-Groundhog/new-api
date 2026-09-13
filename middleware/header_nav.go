@@ -29,6 +29,15 @@ func getHeaderNavAccess(module string) headerNavAccess {
 		}
 	}
 
+	// Modules that stay disabled until the admin explicitly turns them on
+	// (partner sites showcase is opt-in).
+	if module == "partners" {
+		fallback = headerNavAccess{
+			Enabled:     false,
+			RequireAuth: false,
+		}
+	}
+
 	common.OptionMapRWMutex.RLock()
 	raw := common.OptionMap["HeaderNavModules"]
 	common.OptionMapRWMutex.RUnlock()

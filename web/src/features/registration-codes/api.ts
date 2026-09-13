@@ -87,9 +87,7 @@ export async function updateRegistrationCodeStatus(
 }
 
 // Delete a single registration code
-export async function deleteRegistrationCode(
-  id: number
-): Promise<ApiResponse> {
+export async function deleteRegistrationCode(id: number): Promise<ApiResponse> {
   const res = await api.delete(`/api/registration-code/${id}/`)
   return res.data
 }

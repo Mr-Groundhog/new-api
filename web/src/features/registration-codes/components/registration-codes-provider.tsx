@@ -20,7 +20,10 @@ import React, { useState } from 'react'
 
 import useDialogState from '@/hooks/use-dialog'
 
-import { type RegistrationCode, type RegistrationCodesDialogType } from '../types'
+import {
+  type RegistrationCode,
+  type RegistrationCodesDialogType,
+} from '../types'
 
 type RegistrationCodesContextType = {
   open: RegistrationCodesDialogType | null

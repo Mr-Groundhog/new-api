@@ -14,7 +14,9 @@ func cleanupTicketServiceTables(t *testing.T) {
 	t.Helper()
 	require.NoError(t, model.DB.Where("1 = 1").Delete(&model.TicketMessage{}).Error)
 	require.NoError(t, model.DB.Where("1 = 1").Delete(&model.Ticket{}).Error)
-	require.NoError(t, model.DB.Where("1 = 1").Delete(&model.User{}).Error)
+	// User 带 gorm.DeletedAt，普通 Delete 是软删除，主键行仍在，同 ID 重新插入会
+	// 撞唯一约束；测试清理需要真正移除行，必须 Unscoped 硬删除
+	require.NoError(t, model.DB.Unscoped().Where("1 = 1").Delete(&model.User{}).Error)
 }
 
 func insertTicketServiceUser(t *testing.T, id int, username string) {
@@ -44,7 +46,8 @@ func TestValidateTicketInputBoundaries(t *testing.T) {
 		{name: "empty content rejected", ticketTyp: 1, title: "title", content: " \r\n ", wantErr: ErrTicketContentLength},
 		{name: "1000 Chinese content accepted", ticketTyp: 1, title: "title", content: strings.Repeat("容", 1000), wantType: model.TicketTypeAPICall, wantTitle: "title"},
 		{name: "1001 Chinese content rejected", ticketTyp: 1, title: "title", content: strings.Repeat("容", 1001), wantErr: ErrTicketContentLength},
-		{name: "unknown type rejected", ticketTyp: 5, title: "title", content: "hello", wantErr: ErrTicketTypeInvalid},
+		{name: "unknown type rejected", ticketTyp: 6, title: "title", content: "hello", wantErr: ErrTicketTypeInvalid},
+		{name: "cooperation type accepted", ticketTyp: model.TicketTypeCooperation, title: "title", content: "hello", wantType: model.TicketTypeCooperation, wantTitle: "title"},
 		{name: "zero type normalized to api call", ticketTyp: 0, title: "title", content: "hello", wantType: model.TicketTypeAPICall, wantTitle: "title"},
 	}
 	for _, tt := range tests {
@@ -104,14 +107,16 @@ func TestCreateTicketForUserLimits(t *testing.T) {
 	_, err = CreateTicketForUser(1, "alice", model.TicketTypeBilling, "after close", "content", true, todayStart, now+2)
 	assert.NoError(t, err)
 
-	// 每日新建数达到上限后新建被拒；跨天后计数重置
+	// 每日新建数达到上限后新建被拒；跨天后计数重置。
+	// 循环内立即关闭每张工单，避免先撞上「未关闭工单数上限 5」而测不到每日上限
 	cleanupTicketServiceTables(t)
 	insertTicketServiceUser(t, 1, "alice")
 	for i := 0; i < MaxTicketPerUserPerDay; i++ {
-		_, err := CreateTicketForUser(1, "alice", model.TicketTypeOther, "yesterday", "content", true, yesterdayStart, yesterday)
+		detail, err := CreateTicketForUser(1, "alice", model.TicketTypeOther, "yesterday", "content", true, yesterdayStart, yesterday)
 		require.NoError(t, err)
+		require.NoError(t, CloseSelfTicket(1, detail.Id, yesterday+int64(i)))
 	}
-	_, err = CreateTicketForUser(1, "alice", model.TicketTypeOther, "yesterday extra", "content", true, yesterdayStart, yesterday+1)
+	_, err = CreateTicketForUser(1, "alice", model.TicketTypeOther, "yesterday extra", "content", true, yesterdayStart, yesterday+1000)
 	assert.ErrorIs(t, err, model.ErrTicketDailyLimit)
 
 	_, err = CreateTicketForUser(1, "alice", model.TicketTypeOther, "today", "content", true, todayStart, now)

@@ -52,11 +52,7 @@ export function MultiKeyTableRowActions({
         disabled={testing}
         title={t('Test')}
       >
-        {testing ? (
-          <Loader2 className='animate-spin' />
-        ) : (
-          <Zap />
-        )}
+        {testing ? <Loader2 className='animate-spin' /> : <Zap />}
       </Button>
       {isEnabled ? (
         <Button

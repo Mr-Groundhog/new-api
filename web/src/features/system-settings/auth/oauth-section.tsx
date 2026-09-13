@@ -530,7 +530,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                   </h3>
                   <p className='text-muted-foreground mt-1 text-sm'>
                     {t(
-                      'Create a GitHub App with read-only Metadata permission and install it on the target repository. Users bound to GitHub can claim a one-time credit reward after starring the repository.',
+                      'Create a GitHub App with read-only Metadata permission and install it on the target repository. Users bound to GitHub can claim a one-time credit reward after starring the repository.'
                     )}
                   </p>
                 </div>
@@ -544,7 +544,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         <FormLabel>{t('Enable GitHub Star Reward')}</FormLabel>
                         <FormDescription>
                           {t(
-                            'Show the reward entry on the welfare airdrop page and allow claiming',
+                            'Show the reward entry on the welfare airdrop page and allow claiming'
                           )}
                         </FormDescription>
                       </SettingsSwitchContent>
@@ -654,7 +654,9 @@ export function OAuthSection(props: OAuthSectionProps) {
                         />
                       </FormControl>
                       <FormDescription>
-                        {t('Change to a new value to start another reward round')}
+                        {t(
+                          'Change to a new value to start another reward round'
+                        )}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -708,7 +710,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                       </FormControl>
                       <FormDescription>
                         {t(
-                          'Found at the end of the URL on github.com/settings/installations',
+                          'Found at the end of the URL on github.com/settings/installations'
                         )}
                       </FormDescription>
                       <FormMessage />
@@ -724,7 +726,9 @@ export function OAuthSection(props: OAuthSectionProps) {
                       <FormLabel>{t('App Private Key (PEM)')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={'-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'}
+                          placeholder={
+                            '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
+                          }
                           autoComplete='off'
                           rows={5}
                           className='font-mono text-xs'
@@ -738,7 +742,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                       </FormControl>
                       <FormDescription>
                         {t(
-                          'Downloaded when generating the private key in the GitHub App settings',
+                          'Downloaded when generating the private key in the GitHub App settings'
                         )}
                       </FormDescription>
                       <FormMessage />
@@ -755,7 +759,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         <FormLabel>{t('Dry run mode')}</FormLabel>
                         <FormDescription>
                           {t(
-                            'Perform star detection and audit only; no credits are granted',
+                            'Perform star detection and audit only; no credits are granted'
                           )}
                         </FormDescription>
                       </SettingsSwitchContent>
@@ -775,10 +779,12 @@ export function OAuthSection(props: OAuthSectionProps) {
                   render={({ field }) => (
                     <SettingsSwitchItem>
                       <SettingsSwitchContent>
-                        <FormLabel>{t('Sync stargazers periodically')}</FormLabel>
+                        <FormLabel>
+                          {t('Sync stargazers periodically')}
+                        </FormLabel>
                         <FormDescription>
                           {t(
-                            'Refresh the local stargazers cache every 8 hours to reduce GitHub API calls on claim',
+                            'Refresh the local stargazers cache every 8 hours to reduce GitHub API calls on claim'
                           )}
                         </FormDescription>
                       </SettingsSwitchContent>

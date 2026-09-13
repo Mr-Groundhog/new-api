@@ -38,7 +38,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { checkRegistrationCode, register, wechatLoginByCode } from '@/features/auth/api'
+import {
+  checkRegistrationCode,
+  register,
+  wechatLoginByCode,
+} from '@/features/auth/api'
 import { LegalConsent } from '@/features/auth/components/legal-consent'
 import { OAuthProviders } from '@/features/auth/components/oauth-providers'
 import { registerFormSchema } from '@/features/auth/constants'
@@ -436,15 +440,15 @@ export function SignUpForm({
                       {...field}
                     />
                     {registrationCodeRequired && regCodeCheck === 'valid' && (
-                      <Check className='text-emerald-600 pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2' />
+                      <Check className='pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-emerald-600' />
+                    )}
+                    {registrationCodeRequired && regCodeCheck === 'invalid' && (
+                      <X className='text-destructive pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2' />
                     )}
                     {registrationCodeRequired &&
-                      regCodeCheck === 'invalid' && (
-                        <X className='text-destructive pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2' />
+                      regCodeCheck === 'checking' && (
+                        <Loader2 className='text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 animate-spin' />
                       )}
-                    {registrationCodeRequired && regCodeCheck === 'checking' && (
-                      <Loader2 className='text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 animate-spin' />
-                    )}
                   </div>
                 </FormControl>
                 {registrationCodeMessage ? (
@@ -514,9 +518,7 @@ export function SignUpForm({
                   : undefined
               }
               disabledProviders={
-                registrationCodeRequired
-                  ? ['wechat', 'telegram']
-                  : undefined
+                registrationCodeRequired ? ['wechat', 'telegram'] : undefined
               }
               onWeChatLogin={handleOpenWeChatDialog}
               isWeChatLoading={isWeChatSubmitting}

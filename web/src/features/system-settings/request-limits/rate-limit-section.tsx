@@ -45,11 +45,8 @@ import {
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
+import { isValidRateLimitEntry, parseRateLimitEntry } from './rate-limit-config'
 import { RateLimitVisualEditor } from './rate-limit-visual-editor'
-import {
-  isValidRateLimitEntry,
-  parseRateLimitEntry,
-} from './rate-limit-config'
 
 const isValidJSON = (value: string | undefined) => {
   if (!value || value.trim() === '') return true

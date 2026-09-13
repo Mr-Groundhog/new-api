@@ -725,4 +725,24 @@ export const STATIC_I18N_KEYS = [
   'Recheck completed',
   'Sync succeeded',
   'Sync failed',
+
+  // Cooperation & promotion — ticket type, application status, cooperation
+  // method and site type labels
+  // (features/tickets/constants.ts, features/cooperation/constants.ts,
+  // passed into t() at runtime)
+  'Site Cooperation & Promotion',
+  'Pending Review',
+  'Token Support',
+  'User Invitations',
+  'Content Creation',
+  'Link Exchange',
+  'Community Promotion',
+  'Technical Partnership',
+  'Sponsorship',
+  'Personal Blog',
+  'Forum / Community',
+  'Tool Site',
+  'Video Channel',
+  'Dev Team',
+  'Open Source Project',
 ] as const

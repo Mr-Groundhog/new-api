@@ -257,9 +257,7 @@ it('collapses only date and statistics while keeping the right-hand quick action
   expect(await screen.findByText('Usage')).toBeVisible()
 })
 
-it.each([
-  { language: 'zh', resources: zh.translation },
-])(
+it.each([{ language: 'zh', resources: zh.translation }])(
   'labels the calendar-month preset as 本月 in $language and selects the complete month',
   async ({ language, resources }) => {
     vi.useFakeTimers({ toFake: ['Date'] })

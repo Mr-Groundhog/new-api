@@ -8,10 +8,10 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Star } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -24,12 +24,12 @@ import {
 } from '@/components/ui/dialog'
 import { formatQuota } from '@/lib/format'
 
-import { RewardCard } from './reward-card'
 import {
   claimGithubStarReward,
   getGithubStarRewardStatus,
   githubStarRewardQueryKeys,
 } from './api'
+import { RewardCard } from './reward-card'
 
 // GithubStarRewardEntry 是嵌入福利空投页头部操作区的 GitHub Star 奖励入口：
 // 一个打开奖励弹窗的小按钮。活动未开启（或状态加载失败）时不渲染任何内容，
@@ -48,7 +48,9 @@ export function GithubStarRewardEntry() {
     onSuccess: (result) => {
       if (result.dry_run) {
         toast.success(
-          t('Star verified successfully. The reward will be granted once the activity is fully enabled.'),
+          t(
+            'Star verified successfully. The reward will be granted once the activity is fully enabled.'
+          )
         )
       } else if (result.status === 'pending') {
         toast.success(t('Claim submitted. Waiting for admin review'))
@@ -56,7 +58,7 @@ export function GithubStarRewardEntry() {
         toast.success(
           t('Successfully received {{quota}} credit, added to your wallet', {
             quota: formatQuota(result.quota),
-          }),
+          })
         )
       }
       void client.invalidateQueries({
@@ -67,7 +69,7 @@ export function GithubStarRewardEntry() {
       toast.error(
         error instanceof Error
           ? error.message
-          : t('Unable to complete the claim. Please try again.'),
+          : t('Unable to complete the claim. Please try again.')
       )
     },
   })
@@ -92,7 +94,7 @@ export function GithubStarRewardEntry() {
             </DialogTitle>
             <DialogDescription>
               {t(
-                'Star our GitHub repository with the bound account to claim a one-time credit reward.',
+                'Star our GitHub repository with the bound account to claim a one-time credit reward.'
               )}
             </DialogDescription>
           </DialogHeader>

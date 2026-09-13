@@ -8,6 +8,7 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   BadgeCheck,
   CircleX,
@@ -18,7 +19,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { ConfirmDialog } from '@/components/confirm-dialog'
@@ -32,7 +32,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { formatQuota } from '@/lib/format'
 
-import { GithubStarAuditLogsDialog } from './audit-logs-dialog'
 import {
   approveGithubStarRewardClaim,
   githubStarRewardQueryKeys,
@@ -40,13 +39,13 @@ import {
   rejectGithubStarRewardClaim,
   revokeGithubStarRewardClaim,
 } from './api'
+import { GithubStarAuditLogsDialog } from './audit-logs-dialog'
 import type { GithubStarRewardClaim } from './types'
 
-// GithubStarRowActions 提供管理员复审操作（方案第 8 节）：重新检测、查看审计
-// 日志、批准 / 拒绝待审批申请、撤销已发放奖励。拒绝与撤销需填写原因并二次确认。
-export function GithubStarRowActions(props: {
-  claim: GithubStarRewardClaim
-}) {
+// GithubStarRowActions 提供管理员复审操作（方案第 8 节）：批准 / 拒绝待审批
+// 申请直接外露为按钮；重新检测、查看审计日志、撤销已发放奖励收进行操作菜单。
+// 拒绝与撤销需填写原因并二次确认。
+export function GithubStarRowActions(props: { claim: GithubStarRewardClaim }) {
   const { t } = useTranslation()
   const claim = props.claim
   const client = useQueryClient()
@@ -69,17 +68,17 @@ export function GithubStarRowActions(props: {
       invalidate()
       if (result.current.matched) {
         toast.success(
-          t('Recheck passed: the GitHub account is currently starred'),
+          t('Recheck passed: the GitHub account is currently starred')
         )
       } else {
         toast.warning(
-          t('Recheck result: the GitHub account is not starred currently'),
+          t('Recheck result: the GitHub account is not starred currently')
         )
       }
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : t('Operation failed'),
+        error instanceof Error ? error.message : t('Operation failed')
       )
     },
   })
@@ -93,13 +92,14 @@ export function GithubStarRowActions(props: {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : t('Operation failed'),
+        error instanceof Error ? error.message : t('Operation failed')
       )
     },
   })
 
   const rejectMutation = useMutation({
-    mutationFn: () => rejectGithubStarRewardClaim(claim.id, rejectReason.trim()),
+    mutationFn: () =>
+      rejectGithubStarRewardClaim(claim.id, rejectReason.trim()),
     onSuccess: () => {
       toast.success(t('Claim rejected'))
       setRejectOpen(false)
@@ -108,7 +108,7 @@ export function GithubStarRowActions(props: {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : t('Operation failed'),
+        error instanceof Error ? error.message : t('Operation failed')
       )
     },
   })
@@ -123,58 +123,52 @@ export function GithubStarRowActions(props: {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : t('Operation failed'),
+        error instanceof Error ? error.message : t('Operation failed')
       )
     },
   })
 
-  const canApprove =
-    claim.status === 'pending' || claim.status === 'rejected'
+  const canApprove = claim.status === 'pending' || claim.status === 'rejected'
 
   return (
     <>
-      <Button
-        variant='ghost'
-        size='icon-sm'
-        aria-label={t('Recheck')}
-        disabled={recheckMutation.isPending}
-        onClick={() => recheckMutation.mutate()}
-      >
-        {recheckMutation.isPending ? (
-          <LoaderCircle className='animate-spin' aria-hidden='true' />
-        ) : (
-          <RotateCw aria-hidden='true' />
-        )}
-      </Button>
+      {canApprove && (
+        <Button variant='ghost' size='sm' onClick={() => setApproveOpen(true)}>
+          <BadgeCheck aria-hidden='true' />
+          {t('Approve')}
+        </Button>
+      )}
+      {claim.status === 'pending' && (
+        <Button
+          variant='ghost'
+          size='sm'
+          className='text-destructive hover:text-destructive'
+          onClick={() => setRejectOpen(true)}
+        >
+          <CircleX aria-hidden='true' />
+          {t('Reject')}
+        </Button>
+      )}
       <DataTableRowActionMenu ariaLabel={t('Open menu')} modal={false}>
+        <DropdownMenuItem
+          disabled={recheckMutation.isPending}
+          onClick={() => recheckMutation.mutate()}
+        >
+          {t('Recheck')}
+          <DropdownMenuShortcut>
+            {recheckMutation.isPending ? (
+              <LoaderCircle size={16} className='animate-spin' />
+            ) : (
+              <RotateCw size={16} />
+            )}
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setAuditOpen(true)}>
           {t('Audit logs')}
           <DropdownMenuShortcut>
             <ClipboardList size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        {canApprove && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setApproveOpen(true)}>
-              {t('Approve')}
-              <DropdownMenuShortcut>
-                <BadgeCheck size={16} />
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-            {claim.status === 'pending' && (
-              <DropdownMenuItem
-                className='text-destructive focus:text-destructive'
-                onClick={() => setRejectOpen(true)}
-              >
-                {t('Reject')}
-                <DropdownMenuShortcut>
-                  <CircleX size={16} />
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-            )}
-          </>
-        )}
         {claim.status === 'granted' && (
           <>
             <DropdownMenuSeparator />
@@ -207,7 +201,9 @@ export function GithubStarRowActions(props: {
         open={rejectOpen}
         onOpenChange={setRejectOpen}
         title={t('Reject claim')}
-        desc={t('This will reject the claim. The user will not receive the reward.')}
+        desc={t(
+          'This will reject the claim. The user will not receive the reward.'
+        )}
         destructive
         confirmText={t('Reject')}
         disabled={rejectReason.trim() === ''}
@@ -230,7 +226,7 @@ export function GithubStarRowActions(props: {
         title={t('Revoke reward')}
         desc={t(
           'This will deduct {{quota}} from the user balance and mark the claim as revoked. This action cannot be undone.',
-          { quota: formatQuota(claim.reward_quota) },
+          { quota: formatQuota(claim.reward_quota) }
         )}
         destructive
         confirmText={t('Revoke')}

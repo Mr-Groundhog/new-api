@@ -22,7 +22,7 @@ import { readCachedStatus, statusQueryOptions } from '@/lib/status-query'
 
 export type ModuleAccess = { enabled: boolean; requireAuth: boolean }
 
-export type HeaderNavModule = 'rankings' | 'pricing' | 'lottery'
+export type HeaderNavModule = 'rankings' | 'pricing' | 'lottery' | 'partners'
 
 export type HeaderNavModules = {
   home: boolean
@@ -30,6 +30,7 @@ export type HeaderNavModules = {
   pricing: ModuleAccess
   rankings: ModuleAccess
   lottery: ModuleAccess
+  partners: ModuleAccess
   docs: boolean
   about: boolean
   [key: string]: boolean | ModuleAccess
@@ -41,6 +42,8 @@ const DEFAULT_HEADER_NAV_MODULES: HeaderNavModules = {
   pricing: { enabled: true, requireAuth: false },
   rankings: { enabled: true, requireAuth: false },
   lottery: { enabled: true, requireAuth: true },
+  // 合作站点页默认关闭，需管理员在系统设置中手动开启
+  partners: { enabled: false, requireAuth: false },
   docs: true,
   about: true,
 }
@@ -49,6 +52,7 @@ const DEFAULTS: Record<HeaderNavModule, ModuleAccess> = {
   pricing: DEFAULT_HEADER_NAV_MODULES.pricing,
   rankings: DEFAULT_HEADER_NAV_MODULES.rankings,
   lottery: DEFAULT_HEADER_NAV_MODULES.lottery,
+  partners: DEFAULT_HEADER_NAV_MODULES.partners,
 }
 
 function cloneHeaderNavDefaults(): HeaderNavModules {
@@ -57,6 +61,7 @@ function cloneHeaderNavDefaults(): HeaderNavModules {
     pricing: { ...DEFAULT_HEADER_NAV_MODULES.pricing },
     rankings: { ...DEFAULT_HEADER_NAV_MODULES.rankings },
     lottery: { ...DEFAULT_HEADER_NAV_MODULES.lottery },
+    partners: { ...DEFAULT_HEADER_NAV_MODULES.partners },
   }
 }
 
@@ -126,6 +131,10 @@ export function parseHeaderNavModules(raw: unknown): HeaderNavModules {
     }
     if (key === 'lottery') {
       result.lottery = parseAccess(value, result.lottery)
+      return
+    }
+    if (key === 'partners') {
+      result.partners = parseAccess(value, result.partners)
       return
     }
 
@@ -229,5 +238,38 @@ export function isSidebarModuleEnabled(
     return true
   } catch {
     return true
+  }
+}
+
+/**
+ * Whether an admin sidebar entry with a default-closed policy is enabled.
+ *
+ * Used by modules whose default is OFF (e.g. cooperation & promotion): an
+ * absent, blank, or unparsable configuration — or a missing section/module
+ * key — counts as disabled, mirroring the frontend defaults that back-fill
+ * `false`. Only an explicit `true` enables the module. Matches the
+ * server-side `setting.IsSidebarModuleEnabledDefaultClosed` gate.
+ */
+export function isSidebarModuleEnabledDefaultClosed(
+  section: string,
+  module: string
+): boolean {
+  const status = readCachedStatus()
+  if (!status) return false
+
+  const raw = status.SidebarModulesAdmin
+  if (!raw || String(raw).trim() === '') return false
+
+  try {
+    const parsed = JSON.parse(String(raw)) as Record<
+      string,
+      Record<string, boolean>
+    >
+    const sectionConfig = parsed[section]
+    if (!sectionConfig) return false
+    if (sectionConfig.enabled === false) return false
+    return sectionConfig[module] === true
+  } catch {
+    return false
   }
 }

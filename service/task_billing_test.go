@@ -57,6 +57,7 @@ func TestMain(m *testing.M) {
 		&model.SystemTaskLock{},
 		&model.Ticket{},
 		&model.TicketMessage{},
+		&model.CooperationApplication{},
 	); err != nil {
 		panic("failed to migrate: " + err.Error())
 	}

@@ -120,7 +120,9 @@ describe('user detail dialog', () => {
   test('renders an empty state and no request when no user is selected', () => {
     renderDialog(null)
 
-    expect(screen.getByText('No user information available')).toBeInTheDocument()
+    expect(
+      screen.getByText('No user information available')
+    ).toBeInTheDocument()
     expect(getUser).not.toHaveBeenCalled()
   })
 

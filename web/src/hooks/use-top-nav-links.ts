@@ -83,7 +83,11 @@ export function useTopNavLinks(): TopNavLink[] {
   const lottery = modules?.lottery
   if (lottery && typeof lottery === 'object' && lottery.enabled) {
     const requiresAuth = lottery.requireAuth && !isAuthed
-    links.push({ title: t('Mystery nine-grid'), href: '/lottery', requiresAuth })
+    links.push({
+      title: t('Mystery nine-grid'),
+      href: '/lottery',
+      requiresAuth,
+    })
   }
 
   // Rankings
@@ -91,6 +95,13 @@ export function useTopNavLinks(): TopNavLink[] {
   if (rankings && typeof rankings === 'object' && rankings.enabled) {
     const requiresAuth = rankings.requireAuth && !isAuthed
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
+  }
+
+  // Partner sites (configurable, disabled by default)
+  const partners = modules?.partners
+  if (partners && typeof partners === 'object' && partners.enabled) {
+    const requiresAuth = partners.requireAuth && !isAuthed
+    links.push({ title: t('Partner Sites'), href: '/partners', requiresAuth })
   }
 
   // Docs (supports external links)

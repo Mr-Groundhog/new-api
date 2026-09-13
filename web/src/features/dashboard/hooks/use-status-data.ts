@@ -18,7 +18,12 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useStatus } from '@/hooks/use-status'
 
-import type { AnnouncementItem, ApiInfoItem, BroadcastItem, FAQItem } from '../types'
+import type {
+  AnnouncementItem,
+  ApiInfoItem,
+  BroadcastItem,
+  FAQItem,
+} from '../types'
 
 /**
  * Get specific list from status data
@@ -62,10 +67,7 @@ export function useFAQ() {
  * Get global broadcast list (top marquee notices)
  */
 export function useBroadcasts() {
-  return useStatusData<BroadcastItem>(
-    'broadcast_enabled',
-    'broadcasts'
-  )
+  return useStatusData<BroadcastItem>('broadcast_enabled', 'broadcasts')
 }
 
 /**

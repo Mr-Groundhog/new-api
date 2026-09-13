@@ -8,10 +8,10 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useQuery } from '@tanstack/react-query'
 import { ClipboardList, LoaderCircle } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQuery } from '@tanstack/react-query'
 
 import {
   Dialog,
@@ -22,24 +22,20 @@ import {
 } from '@/components/ui/dialog'
 import { formatTimestampToDate } from '@/lib/format'
 
-import {
-  getGithubStarAuditLogs,
-  githubStarRewardQueryKeys,
-} from './api'
+import { getGithubStarAuditLogs, githubStarRewardQueryKeys } from './api'
 import {
   GITHUB_STAR_AUDIT_ACTION_LABELS,
   GITHUB_STAR_AUDIT_RESULT_LABELS,
 } from './constants'
-import type {
-  GithubStarAuditLog,
-  GithubStarRewardClaim,
-} from './types'
+import type { GithubStarAuditLog, GithubStarRewardClaim } from './types'
 
 function AuditEntry(props: { entry: GithubStarAuditLog }) {
   const { t } = useTranslation()
   const entry = props.entry
-  const actionLabel = GITHUB_STAR_AUDIT_ACTION_LABELS[entry.action] ?? entry.action
-  const resultLabel = GITHUB_STAR_AUDIT_RESULT_LABELS[entry.result] ?? entry.result
+  const actionLabel =
+    GITHUB_STAR_AUDIT_ACTION_LABELS[entry.action] ?? entry.action
+  const resultLabel =
+    GITHUB_STAR_AUDIT_RESULT_LABELS[entry.result] ?? entry.result
   return (
     <div className='border-b py-3 last:border-b-0'>
       <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
@@ -52,7 +48,7 @@ function AuditEntry(props: { entry: GithubStarAuditLog }) {
             className={
               entry.matched
                 ? 'text-xs text-emerald-500'
-                : 'text-xs text-destructive'
+                : 'text-destructive text-xs'
             }
           >
             {entry.matched ? t('Matched') : t('Not matched')}
@@ -79,7 +75,7 @@ function AuditEntry(props: { entry: GithubStarAuditLog }) {
         {entry.request_id ? ` · ${entry.request_id}` : ''}
       </p>
       {entry.detail && (
-        <p className='text-muted-foreground mt-1 break-all text-xs'>
+        <p className='text-muted-foreground mt-1 text-xs break-all'>
           {entry.detail}
         </p>
       )}

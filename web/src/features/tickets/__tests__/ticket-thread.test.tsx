@@ -74,9 +74,7 @@ describe('ticket composer disabled state', () => {
       screen.getByText('This ticket is closed and no longer accepts replies.')
     ).toBeInTheDocument()
     expect(screen.getByLabelText('Add a note…')).toBeDisabled()
-    expect(
-      screen.getByRole('button', { name: 'Submit Reply' })
-    ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Submit Reply' })).toBeDisabled()
   })
 
   test('submits normalized content and clears the input', () => {
@@ -90,7 +88,9 @@ describe('ticket composer disabled state', () => {
     )
 
     const textarea = screen.getByLabelText('Add a note…')
-    fireEvent.change(textarea, { target: { value: 'still failing\r\nafter fix' } })
+    fireEvent.change(textarea, {
+      target: { value: 'still failing\r\nafter fix' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Submit Reply' }))
 
     expect(onSubmit).toHaveBeenCalledTimes(1)

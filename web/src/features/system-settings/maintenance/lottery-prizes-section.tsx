@@ -20,7 +20,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
-import { formatQuota, parseQuotaFromDollars, quotaUnitsToDollars } from '@/lib/format'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -43,6 +42,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  formatQuota,
+  parseQuotaFromDollars,
+  quotaUnitsToDollars,
+} from '@/lib/format'
 
 import { SettingsSection } from '../components/settings-section'
 import {
@@ -250,10 +254,7 @@ export function LotteryPrizesSection() {
           )}
 
           <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setIsDialogOpen(false)}
-            >
+            <Button variant='outline' onClick={() => setIsDialogOpen(false)}>
               {t('Cancel')}
             </Button>
             <Button

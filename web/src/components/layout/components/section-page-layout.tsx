@@ -75,6 +75,14 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
       content = child.props.children
     } else if (child.type === SectionPageLayoutBreadcrumb) {
       breadcrumb = child.props.children
+    } else if (import.meta.env.DEV) {
+      // 布局只渲染四种插槽，其它子节点会被静默丢弃；弹窗等组件
+      // 放在这里会"打不开且无报错"，规范见 web/AGENTS.md 3.3 组件
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[SectionPageLayout] 不支持的直接子节点将被丢弃（只允许 Title/Actions/Content/Breadcrumb 插槽），请把弹窗等组件移到布局外或 Content 内：',
+        child.type
+      )
     }
   })
 

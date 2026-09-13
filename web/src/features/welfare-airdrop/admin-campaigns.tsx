@@ -8,10 +8,10 @@ License, or (at your option) any later version.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { LoaderCircle, Settings } from 'lucide-react'
 import { useCallback, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import {
@@ -52,10 +52,10 @@ function AdminCampaignRow({
   const { t } = useTranslation()
   const enabled = campaign.status === 1
   return (
-    <div className="flex flex-col gap-3 border-b py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
-      <div className="min-w-0">
-        <p className="flex items-center gap-2 font-medium">
-          <span className="truncate">{campaign.name}</span>
+    <div className='flex flex-col gap-3 border-b py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='min-w-0'>
+        <p className='flex items-center gap-2 font-medium'>
+          <span className='truncate'>{campaign.name}</span>
           <Badge
             className={
               enabled
@@ -66,17 +66,17 @@ function AdminCampaignRow({
             {enabled ? t('Enabled') : t('Disabled')}
           </Badge>
         </p>
-        <p className="text-muted-foreground mt-0.5 text-xs">
+        <p className='text-muted-foreground mt-0.5 text-xs'>
           {t('Airdrop batch ID')}: {campaign.batch_id} ·{' '}
           {formatQuota(campaign.quota)} · {campaign.claimed_count} /{' '}
           {campaign.total_count === 0 ? t('Unlimited') : campaign.total_count}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className='flex shrink-0 items-center gap-2'>
         <Button
-          type="button"
-          variant="outline"
-          size="sm"
+          type='button'
+          variant='outline'
+          size='sm'
           disabled={pending}
           onClick={onToggle}
         >
@@ -85,7 +85,7 @@ function AdminCampaignRow({
         <AlertDialog>
           <AlertDialogTrigger
             render={
-              <Button type="button" variant="destructive" size="sm">
+              <Button type='button' variant='destructive' size='sm'>
                 {t('Delete')}
               </Button>
             }
@@ -95,7 +95,7 @@ function AdminCampaignRow({
               <AlertDialogTitle>{t('Delete campaign')}</AlertDialogTitle>
               <AlertDialogDescription>
                 {t(
-                  'Deleting the campaign will not revoke credits that were already claimed.',
+                  'Deleting the campaign will not revoke credits that were already claimed.'
                 )}
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -144,13 +144,13 @@ export function AdminCampaigns() {
   let list: ReactNode
   if (query.isLoading) {
     list = (
-      <div className="text-muted-foreground flex justify-center py-8">
-        <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
+      <div className='text-muted-foreground flex justify-center py-8'>
+        <LoaderCircle className='size-6 animate-spin' aria-hidden='true' />
       </div>
     )
   } else if (campaigns.length === 0) {
     list = (
-      <p className="text-muted-foreground py-8 text-center text-sm">
+      <p className='text-muted-foreground py-8 text-center text-sm'>
         {t('No campaigns yet')}
       </p>
     )
@@ -175,12 +175,12 @@ export function AdminCampaigns() {
     ))
   }
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border">
-      <h2 className="flex shrink-0 items-center gap-2 border-b px-5 py-4 font-semibold">
-        <Settings className="size-4 text-cyan-500" aria-hidden="true" />
+    <div className='flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border'>
+      <h2 className='flex shrink-0 items-center gap-2 border-b px-5 py-4 font-semibold'>
+        <Settings className='size-4 text-cyan-500' aria-hidden='true' />
         {t('Campaign management')}
       </h2>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-1">{list}</div>
+      <div className='min-h-0 flex-1 overflow-y-auto px-5 py-1'>{list}</div>
     </div>
   )
 }

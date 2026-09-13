@@ -160,11 +160,10 @@ export function RegistrationCodesMobileList(
 
             {code.used_user_id !== 0 && (
               <div className='flex items-center justify-between gap-2 text-xs'>
-                <span className='text-muted-foreground'>
-                  {t('Bound User')}
-                </span>
+                <span className='text-muted-foreground'>{t('Bound User')}</span>
                 <span className='font-medium'>
-                  {code.used_username || t('User {{id}}', { id: code.used_user_id })}
+                  {code.used_username ||
+                    t('User {{id}}', { id: code.used_user_id })}
                 </span>
               </div>
             )}

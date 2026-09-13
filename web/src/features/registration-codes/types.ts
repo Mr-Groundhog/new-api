@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { z } from "zod";
+import { z } from 'zod'
 
 // ============================================================================
 // Registration Code Schema & Types
@@ -33,53 +33,53 @@ export const registrationCodeSchema = z.object({
   used_user_id: z.number(),
   used_username: z.string(),
   expired_time: z.number(), // 0 for never expires
-});
+})
 
-export type RegistrationCode = z.infer<typeof registrationCodeSchema>;
+export type RegistrationCode = z.infer<typeof registrationCodeSchema>
 
 // ============================================================================
 // API Request/Response Types
 // ============================================================================
 
 export interface ApiResponse<T = unknown> {
-  success: boolean;
-  message?: string;
-  data?: T;
+  success: boolean
+  message?: string
+  data?: T
 }
 
 export interface GetRegistrationCodesParams {
-  p?: number;
-  page_size?: number;
+  p?: number
+  page_size?: number
 }
 
 export interface GetRegistrationCodesResponse {
-  success: boolean;
-  message?: string;
+  success: boolean
+  message?: string
   data?: {
-    items: RegistrationCode[];
-    total: number;
-    page: number;
-    page_size: number;
-  };
+    items: RegistrationCode[]
+    total: number
+    page: number
+    page_size: number
+  }
 }
 
 export interface SearchRegistrationCodesParams {
-  keyword?: string;
-  status?: string;
-  p?: number;
-  page_size?: number;
+  keyword?: string
+  status?: string
+  p?: number
+  page_size?: number
 }
 
 export interface RegistrationCodeFormData {
-  id?: number;
-  name: string;
-  expired_time: number;
-  count?: number; // Only for create
-  status?: number; // Only for status update
+  id?: number
+  name: string
+  expired_time: number
+  count?: number // Only for create
+  status?: number // Only for status update
 }
 
 // ============================================================================
 // Dialog Types
 // ============================================================================
 
-export type RegistrationCodesDialogType = "update" | "delete";
+export type RegistrationCodesDialogType = 'update' | 'delete'

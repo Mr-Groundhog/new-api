@@ -77,3 +77,28 @@ func IsSidebarModuleEnabled(section string, module string) bool {
 	}
 	return true
 }
+
+// IsSidebarModuleEnabledDefaultClosed 是「默认关闭」版本的模块判定，供合作推广
+// 这类默认不开启的功能使用：section / module 未出现在已保存配置中（历史部署、
+// 从未保存过侧边栏设置）或选项解析失败时一律视为关闭，只有显式置为 true 才算
+// 开启。与前端把默认值回填为 false 的 mergeWithDefaultSidebarModules 判定保持
+// 一致，避免「前端不显示入口、服务端却放行写入」的错位。
+func IsSidebarModuleEnabledDefaultClosed(section string, module string) bool {
+	common.OptionMapRWMutex.RLock()
+	raw := common.OptionMap["SidebarModulesAdmin"]
+	common.OptionMapRWMutex.RUnlock()
+
+	parsed, valid := parseSidebarModulesAdminRaw(raw)
+	if !valid {
+		return false
+	}
+	sectionConfig, ok := parsed[section]
+	if !ok || sectionConfig == nil {
+		return false
+	}
+	if enabled, ok := sectionConfig["enabled"].(bool); ok && !enabled {
+		return false
+	}
+	value, ok := sectionConfig[module].(bool)
+	return ok && value
+}

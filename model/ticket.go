@@ -15,12 +15,13 @@ const (
 	TicketStatusClosed  = 3 // 已关闭：不再接受新消息
 )
 
-// 工单分类，固定 4 种，不支持自定义。
+// 工单分类，固定 5 种，不支持自定义。
 const (
-	TicketTypeAPICall = 1 // api调用
-	TicketTypeAccount = 2 // 账号问题
-	TicketTypeBilling = 3 // 账单问题
-	TicketTypeOther   = 4 // 其他
+	TicketTypeAPICall     = 1 // api调用
+	TicketTypeAccount     = 2 // 账号问题
+	TicketTypeBilling     = 3 // 账单问题
+	TicketTypeOther       = 4 // 其他
+	TicketTypeCooperation = 5 // 站点合作与推广
 )
 
 // 一条工单消息的发送方身份。

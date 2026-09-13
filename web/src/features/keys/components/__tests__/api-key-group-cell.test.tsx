@@ -128,11 +128,7 @@ describe('API key group table cell', () => {
 
   test('renders an unclipped ring and a localized Auto ratio when API data uses a nonlocalized string', () => {
     const { container } = render(
-      <CellHarness
-        group='auto'
-        ratio='自动'
-        shouldReduceMotion={false}
-      />
+      <CellHarness group='auto' ratio='自动' shouldReduceMotion={false} />
     )
     const group = screen.getByText('Cross-group')
     const multiplier = screen
@@ -160,7 +156,9 @@ describe('API key group table cell', () => {
   })
 
   test('shows only the cross-group badge when ratio data is unavailable', () => {
-    const { container } = render(<CellHarness group='auto' shouldReduceMotion={false} />)
+    const { container } = render(
+      <CellHarness group='auto' shouldReduceMotion={false} />
+    )
 
     expect(container.querySelectorAll('[data-auto-group-frame]').length).toBe(0)
     expect(

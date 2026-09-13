@@ -380,3 +380,30 @@ const (
 	MsgTicketMessageLimit  = "ticket.message_limit"
 	MsgTicketStatusInvalid = "ticket.status_invalid"
 )
+
+// Cooperation application related messages
+const (
+	MsgCooperationDisabled           = "cooperation.disabled"
+	MsgCooperationNotFound           = "cooperation.not_found"
+	MsgCooperationPendingLimit       = "cooperation.pending_limit"
+	MsgCooperationDailyLimit         = "cooperation.daily_limit"
+	MsgCooperationNotPending         = "cooperation.not_pending"
+	MsgCooperationStatusInvalid      = "cooperation.status_invalid"
+	MsgCooperationSiteNameLength     = "cooperation.site_name_length"
+	MsgCooperationSiteUrlInvalid     = "cooperation.site_url_invalid"
+	MsgCooperationSiteTypeInvalid    = "cooperation.site_type_invalid"
+	MsgCooperationDescriptionLength  = "cooperation.description_length"
+	MsgCooperationAudienceLength     = "cooperation.audience_length"
+	MsgCooperationMethodInvalid      = "cooperation.method_invalid"
+	MsgCooperationContactLength      = "cooperation.contact_length"
+	MsgCooperationNotesLength        = "cooperation.notes_length"
+	MsgCooperationReviewNoteLength   = "cooperation.review_note_length"
+	MsgCooperationRejectNoteRequired = "cooperation.reject_note_required"
+
+	MsgCooperationSiteNotFound          = "cooperation.site_not_found"
+	MsgCooperationSiteImageInvalid      = "cooperation.site_image_invalid"
+	MsgCooperationSiteDescriptionLength = "cooperation.site_description_length"
+
+	MsgCooperationSiteBannerInvalid = "cooperation.site_banner_invalid"
+	MsgCooperationMethodDisabled    = "cooperation.method_disabled"
+)

@@ -136,9 +136,9 @@ describe('sensitive-word violation interactions', () => {
   test('highlighted users show a badge in the user list', async () => {
     renderViolations()
 
-    expect(await screen.findByRole('button', { name: /alice/ })).toHaveTextContent(
-      'Highlighted'
-    )
+    expect(
+      await screen.findByRole('button', { name: /alice/ })
+    ).toHaveTextContent('Highlighted')
   })
 
   test('expanding a user loads only that user violations', async () => {
@@ -189,7 +189,9 @@ describe('sensitive-word violation interactions', () => {
     renderViolations()
     await expandUserRow()
 
-    const contentButton = screen.getByRole('button', { name: 'a secret request' })
+    const contentButton = screen.getByRole('button', {
+      name: 'a secret request',
+    })
     expect(contentButton).not.toHaveAttribute('title')
 
     fireEvent.click(contentButton)
@@ -203,6 +205,8 @@ describe('sensitive-word violation interactions', () => {
     renderViolations()
     await expandUserRow()
 
-    expect(screen.getByRole('button', { name: 'Delete records' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Delete records' })
+    ).toBeDisabled()
   })
 })

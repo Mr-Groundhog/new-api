@@ -17,7 +17,8 @@ export const GITHUB_STAR_CLAIM_STATUSES = [
   'rejected',
   'revoked',
 ] as const
-export type GithubStarClaimStatusValue = (typeof GITHUB_STAR_CLAIM_STATUSES)[number]
+export type GithubStarClaimStatusValue =
+  (typeof GITHUB_STAR_CLAIM_STATUSES)[number]
 
 export function getGithubStarStatusOptions(t: TFunction) {
   return GITHUB_STAR_CLAIM_STATUSES.map((status) => ({

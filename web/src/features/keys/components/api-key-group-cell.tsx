@@ -74,7 +74,8 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
   const group = (props.apiKey.group || '').trim()
   const isAuto = group === 'auto'
   const canSwitch = props.groupOptions.length > 0
-  const ratio = group && typeof props.ratio === 'number' ? props.ratio : undefined
+  const ratio =
+    group && typeof props.ratio === 'number' ? props.ratio : undefined
 
   const filteredOptions = useMemo(() => {
     const search = searchValue.trim().toLowerCase()
@@ -146,7 +147,10 @@ export function ApiKeyGroupCell(props: ApiKeyGroupCellProps) {
             ratio={ratio}
             ratioLabel={group ? undefined : t('Inherited')}
             className='px-0'
-            containerClassName={cn('gap-3', isMobile && 'w-full justify-between')}
+            containerClassName={cn(
+              'gap-3',
+              isMobile && 'w-full justify-between'
+            )}
           />
         </TruncatedCell>
       )

@@ -31,12 +31,15 @@ import { Route as AuthenticatedSystemSettingsRouteRouteImport } from './routes/_
 import { Route as AboutIndexRouteImport } from './routes/about/index'
 import { Route as LotteryIndexRouteImport } from './routes/lottery/index'
 import { Route as OauthProviderRouteImport } from './routes/oauth/$provider'
+import { Route as PartnersIndexRouteImport } from './routes/partners/index'
 import { Route as PricingIndexRouteImport } from './routes/pricing/index'
 import { Route as RankingsIndexRouteImport } from './routes/rankings/index'
 import { Route as SetupIndexRouteImport } from './routes/setup/index'
 import { Route as authUserResetRouteImport } from './routes/(auth)/user/reset'
 import { Route as AuthenticatedChannelsIndexRouteImport } from './routes/_authenticated/channels/index'
 import { Route as AuthenticatedChatChatIdRouteImport } from './routes/_authenticated/chat/$chatId'
+import { Route as AuthenticatedCooperationManagementIndexRouteImport } from './routes/_authenticated/cooperation-management/index'
+import { Route as AuthenticatedCooperationIndexRouteImport } from './routes/_authenticated/cooperation/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as AuthenticatedDashboardSectionRouteImport } from './routes/_authenticated/dashboard/$section'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
@@ -186,6 +189,11 @@ const OauthProviderRoute = OauthProviderRouteImport.update({
   path: '/oauth/$provider',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnersIndexRoute = PartnersIndexRouteImport.update({
+  id: '/partners/',
+  path: '/partners/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingIndexRoute = PricingIndexRouteImport.update({
   id: '/pricing/',
   path: '/pricing/',
@@ -217,6 +225,18 @@ const AuthenticatedChatChatIdRoute = AuthenticatedChatChatIdRouteImport.update({
   path: '/chat/$chatId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCooperationManagementIndexRoute =
+  AuthenticatedCooperationManagementIndexRouteImport.update({
+    id: '/cooperation-management/',
+    path: '/cooperation-management/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCooperationIndexRoute =
+  AuthenticatedCooperationIndexRouteImport.update({
+    id: '/cooperation/',
+    path: '/cooperation/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
@@ -470,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/oauth/$provider': typeof OauthProviderRoute
   '/about/': typeof AboutIndexRoute
   '/lottery/': typeof LotteryIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -481,6 +502,8 @@ export interface FileRoutesByFullPath {
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/usage-logs/audit': typeof AuthenticatedUsageLogsAuditRoute
   '/channels/': typeof AuthenticatedChannelsIndexRoute
+  '/cooperation-management/': typeof AuthenticatedCooperationManagementIndexRoute
+  '/cooperation/': typeof AuthenticatedCooperationIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/keys/': typeof AuthenticatedKeysIndexRoute
   '/models/': typeof AuthenticatedModelsIndexRoute
@@ -536,6 +559,7 @@ export interface FileRoutesByTo {
   '/oauth/$provider': typeof OauthProviderRoute
   '/about': typeof AboutIndexRoute
   '/lottery': typeof LotteryIndexRoute
+  '/partners': typeof PartnersIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/rankings': typeof RankingsIndexRoute
   '/setup': typeof SetupIndexRoute
@@ -547,6 +571,8 @@ export interface FileRoutesByTo {
   '/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/usage-logs/audit': typeof AuthenticatedUsageLogsAuditRoute
   '/channels': typeof AuthenticatedChannelsIndexRoute
+  '/cooperation-management': typeof AuthenticatedCooperationManagementIndexRoute
+  '/cooperation': typeof AuthenticatedCooperationIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/keys': typeof AuthenticatedKeysIndexRoute
   '/models': typeof AuthenticatedModelsIndexRoute
@@ -606,6 +632,7 @@ export interface FileRoutesById {
   '/oauth/$provider': typeof OauthProviderRoute
   '/about/': typeof AboutIndexRoute
   '/lottery/': typeof LotteryIndexRoute
+  '/partners/': typeof PartnersIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -617,6 +644,8 @@ export interface FileRoutesById {
   '/_authenticated/usage-logs/$section': typeof AuthenticatedUsageLogsSectionRoute
   '/_authenticated/usage-logs/audit': typeof AuthenticatedUsageLogsAuditRoute
   '/_authenticated/channels/': typeof AuthenticatedChannelsIndexRoute
+  '/_authenticated/cooperation-management/': typeof AuthenticatedCooperationManagementIndexRoute
+  '/_authenticated/cooperation/': typeof AuthenticatedCooperationIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/keys/': typeof AuthenticatedKeysIndexRoute
   '/_authenticated/models/': typeof AuthenticatedModelsIndexRoute
@@ -675,6 +704,7 @@ export interface FileRouteTypes {
     | '/oauth/$provider'
     | '/about/'
     | '/lottery/'
+    | '/partners/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -686,6 +716,8 @@ export interface FileRouteTypes {
     | '/usage-logs/$section'
     | '/usage-logs/audit'
     | '/channels/'
+    | '/cooperation-management/'
+    | '/cooperation/'
     | '/dashboard/'
     | '/keys/'
     | '/models/'
@@ -741,6 +773,7 @@ export interface FileRouteTypes {
     | '/oauth/$provider'
     | '/about'
     | '/lottery'
+    | '/partners'
     | '/pricing'
     | '/rankings'
     | '/setup'
@@ -752,6 +785,8 @@ export interface FileRouteTypes {
     | '/usage-logs/$section'
     | '/usage-logs/audit'
     | '/channels'
+    | '/cooperation-management'
+    | '/cooperation'
     | '/dashboard'
     | '/keys'
     | '/models'
@@ -810,6 +845,7 @@ export interface FileRouteTypes {
     | '/oauth/$provider'
     | '/about/'
     | '/lottery/'
+    | '/partners/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -821,6 +857,8 @@ export interface FileRouteTypes {
     | '/_authenticated/usage-logs/$section'
     | '/_authenticated/usage-logs/audit'
     | '/_authenticated/channels/'
+    | '/_authenticated/cooperation-management/'
+    | '/_authenticated/cooperation/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/keys/'
     | '/_authenticated/models/'
@@ -871,6 +909,7 @@ export interface RootRouteChildren {
   OauthProviderRoute: typeof OauthProviderRoute
   AboutIndexRoute: typeof AboutIndexRoute
   LotteryIndexRoute: typeof LotteryIndexRoute
+  PartnersIndexRoute: typeof PartnersIndexRoute
   PricingIndexRoute: typeof PricingIndexRoute
   RankingsIndexRoute: typeof RankingsIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
@@ -1033,6 +1072,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OauthProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partners/': {
+      id: '/partners/'
+      path: '/partners'
+      fullPath: '/partners/'
+      preLoaderRoute: typeof PartnersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing/': {
       id: '/pricing/'
       path: '/pricing'
@@ -1073,6 +1119,20 @@ declare module '@tanstack/react-router' {
       path: '/chat/$chatId'
       fullPath: '/chat/$chatId'
       preLoaderRoute: typeof AuthenticatedChatChatIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cooperation-management/': {
+      id: '/_authenticated/cooperation-management/'
+      path: '/cooperation-management'
+      fullPath: '/cooperation-management/'
+      preLoaderRoute: typeof AuthenticatedCooperationManagementIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cooperation/': {
+      id: '/_authenticated/cooperation/'
+      path: '/cooperation'
+      fullPath: '/cooperation/'
+      preLoaderRoute: typeof AuthenticatedCooperationIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/': {
@@ -1444,6 +1504,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsageLogsSectionRoute: typeof AuthenticatedUsageLogsSectionRoute
   AuthenticatedUsageLogsAuditRoute: typeof AuthenticatedUsageLogsAuditRoute
   AuthenticatedChannelsIndexRoute: typeof AuthenticatedChannelsIndexRoute
+  AuthenticatedCooperationManagementIndexRoute: typeof AuthenticatedCooperationManagementIndexRoute
+  AuthenticatedCooperationIndexRoute: typeof AuthenticatedCooperationIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedKeysIndexRoute: typeof AuthenticatedKeysIndexRoute
   AuthenticatedModelsIndexRoute: typeof AuthenticatedModelsIndexRoute
@@ -1475,6 +1537,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsageLogsSectionRoute: AuthenticatedUsageLogsSectionRoute,
   AuthenticatedUsageLogsAuditRoute: AuthenticatedUsageLogsAuditRoute,
   AuthenticatedChannelsIndexRoute: AuthenticatedChannelsIndexRoute,
+  AuthenticatedCooperationManagementIndexRoute:
+    AuthenticatedCooperationManagementIndexRoute,
+  AuthenticatedCooperationIndexRoute: AuthenticatedCooperationIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedKeysIndexRoute: AuthenticatedKeysIndexRoute,
   AuthenticatedModelsIndexRoute: AuthenticatedModelsIndexRoute,
@@ -1515,6 +1580,7 @@ const rootRouteChildren: RootRouteChildren = {
   OauthProviderRoute: OauthProviderRoute,
   AboutIndexRoute: AboutIndexRoute,
   LotteryIndexRoute: LotteryIndexRoute,
+  PartnersIndexRoute: PartnersIndexRoute,
   PricingIndexRoute: PricingIndexRoute,
   RankingsIndexRoute: RankingsIndexRoute,
   SetupIndexRoute: SetupIndexRoute,

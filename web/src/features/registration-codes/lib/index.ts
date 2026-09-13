@@ -59,14 +59,8 @@ export function getRegistrationCodeFormSchema(t: TFunction) {
   return z.object({
     name: z
       .string()
-      .min(
-        REGISTRATION_VALIDATION.NAME_MIN_LENGTH,
-        msg.NAME_LENGTH_INVALID
-      )
-      .max(
-        REGISTRATION_VALIDATION.NAME_MAX_LENGTH,
-        msg.NAME_LENGTH_INVALID
-      ),
+      .min(REGISTRATION_VALIDATION.NAME_MIN_LENGTH, msg.NAME_LENGTH_INVALID)
+      .max(REGISTRATION_VALIDATION.NAME_MAX_LENGTH, msg.NAME_LENGTH_INVALID),
     expired_time: z.date().optional(),
     count: z
       .number()
@@ -113,9 +107,7 @@ export function transformRegistrationCodeToFormDefaults(
   return {
     name: code.name,
     expired_time:
-      code.expired_time > 0
-        ? new Date(code.expired_time * 1000)
-        : undefined,
+      code.expired_time > 0 ? new Date(code.expired_time * 1000) : undefined,
     count: 1,
   }
 }

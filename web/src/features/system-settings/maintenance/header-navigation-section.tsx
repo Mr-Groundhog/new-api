@@ -57,6 +57,8 @@ const headerNavSchema = z.object({
   rankingsRequireAuth: z.boolean(),
   lotteryEnabled: z.boolean(),
   lotteryRequireAuth: z.boolean(),
+  partnersEnabled: z.boolean(),
+  partnersRequireAuth: z.boolean(),
   docs: z.boolean(),
   about: z.boolean(),
 })
@@ -99,6 +101,14 @@ const toFormValues = (config: HeaderNavModulesConfig): HeaderNavFormValues => ({
     config.lottery?.requireAuth === undefined
       ? HEADER_NAV_DEFAULT.lottery.requireAuth
       : Boolean(config.lottery.requireAuth),
+  partnersEnabled:
+    config.partners?.enabled === undefined
+      ? HEADER_NAV_DEFAULT.partners.enabled
+      : Boolean(config.partners.enabled),
+  partnersRequireAuth:
+    config.partners?.requireAuth === undefined
+      ? HEADER_NAV_DEFAULT.partners.requireAuth
+      : Boolean(config.partners.requireAuth),
   docs:
     config.docs === undefined ? HEADER_NAV_DEFAULT.docs : Boolean(config.docs),
   about:
@@ -145,6 +155,11 @@ export function HeaderNavigationSection({
         ...(config.lottery ?? HEADER_NAV_DEFAULT.lottery),
         enabled: values.lotteryEnabled,
         requireAuth: values.lotteryRequireAuth,
+      },
+      partners: {
+        ...(config.partners ?? HEADER_NAV_DEFAULT.partners),
+        enabled: values.partnersEnabled,
+        requireAuth: values.partnersRequireAuth,
       },
     }
 
@@ -193,7 +208,11 @@ export function HeaderNavigationSection({
   const accessModules: Array<{
     enabledKey: keyof HeaderNavFormValues
     requireAuthKey: keyof HeaderNavFormValues
-    requireAuthDependsOn: 'pricingEnabled' | 'rankingsEnabled' | 'lotteryEnabled'
+    requireAuthDependsOn:
+      | 'pricingEnabled'
+      | 'rankingsEnabled'
+      | 'lotteryEnabled'
+      | 'partnersEnabled'
     title: string
     description: string
     requireAuthTitle: string
@@ -230,6 +249,19 @@ export function HeaderNavigationSection({
       requireAuthTitle: t('Require login to view the lottery'),
       requireAuthDescription: t(
         'Visitors must authenticate before accessing the lottery page.'
+      ),
+    },
+    {
+      enabledKey: 'partnersEnabled',
+      requireAuthKey: 'partnersRequireAuth',
+      requireAuthDependsOn: 'partnersEnabled',
+      title: t('Partner Sites'),
+      description: t(
+        'Showcase page for cooperating sites with optional carousel.'
+      ),
+      requireAuthTitle: t('Require login to view partner sites'),
+      requireAuthDescription: t(
+        'Visitors must authenticate before accessing the partner sites page.'
       ),
     },
   ]

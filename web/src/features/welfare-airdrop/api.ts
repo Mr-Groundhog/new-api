@@ -35,7 +35,10 @@ export type AdminWelfareAirdrop = {
   batch_id: string
 }
 
-function requireData<T>(response: WelfareAirdropApiResponse<T>, fallback: string) {
+function requireData<T>(
+  response: WelfareAirdropApiResponse<T>,
+  fallback: string
+) {
   if (!response.success || response.data === undefined) {
     throw new Error(response.code || fallback)
   }
@@ -50,7 +53,9 @@ export async function getWelfareAirdrops(): Promise<WelfareAirdrop[]> {
   return requireData(response.data, 'WELFARE_AIRDROP_LOAD_FAILED')
 }
 
-export async function getWelfareAirdropClaims(): Promise<WelfareAirdropClaim[]> {
+export async function getWelfareAirdropClaims(): Promise<
+  WelfareAirdropClaim[]
+> {
   const response = await api.get<
     WelfareAirdropApiResponse<WelfareAirdropClaim[]>
   >('/api/welfare-airdrop/my-claims', { skipErrorHandler: true })
@@ -90,15 +95,13 @@ export async function claimWelfareAirdrop(
   try {
     const response = await api.post<
       WelfareAirdropApiResponse<WelfareAirdropClaim>
-    >(
-      `/api/welfare-airdrop/claim/${airdropId}`,
-      {},
-      { skipErrorHandler: true }
-    )
+    >(`/api/welfare-airdrop/claim/${airdropId}`, {}, { skipErrorHandler: true })
     return requireData(response.data, 'WELFARE_AIRDROP_CLAIM_FAILED')
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'response' in error) {
-      const response = (error as { response?: { data?: WelfareAirdropApiResponse<unknown> } }).response
+      const response = (
+        error as { response?: { data?: WelfareAirdropApiResponse<unknown> } }
+      ).response
       const code = response?.data?.code
       if (code) throw new Error(code)
     }

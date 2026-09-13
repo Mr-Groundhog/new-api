@@ -104,7 +104,10 @@ export function findMatchSegments(
   for (const range of ranges) {
     if (range.start < cursor) continue
     if (range.start > cursor) {
-      segments.push({ text: content.slice(cursor, range.start), matchIndex: null })
+      segments.push({
+        text: content.slice(cursor, range.start),
+        matchIndex: null,
+      })
     }
     segments.push({ text: content.slice(range.start, range.end), matchIndex })
     matchIndex += 1

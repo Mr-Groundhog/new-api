@@ -70,12 +70,7 @@ const createRateLimitDialogSchema = (t: (key: string) => string) =>
       .int()
       .min(1, t('Must be at least 1'))
       .max(MAX_RATE_LIMIT_VALUE, t('Must be at most 2,147,483,647')),
-    clientPreset: z.enum([
-      'unrestricted',
-      'codex',
-      'claude-code',
-      'custom',
-    ]),
+    clientPreset: z.enum(['unrestricted', 'codex', 'claude-code', 'custom']),
     clientRegex: z.string().refine(isValidClientRegex, {
       message: t(
         'Enter a valid regular expression without surrounding spaces (maximum 512 characters)'

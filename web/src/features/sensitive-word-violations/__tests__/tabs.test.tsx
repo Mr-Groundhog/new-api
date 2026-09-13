@@ -89,10 +89,16 @@ describe('risk control center tabs', () => {
   test('opening the risk control center shows both tabs and the triggers table first', () => {
     renderRiskControlCenter()
 
-    expect(screen.getByRole('tab', { name: 'Sensitive Word Triggers' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Liveness Check List' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('tab', { name: 'Sensitive Word Triggers' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('tab', { name: 'Liveness Check List' })
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument()
-    expect(screen.getByText('Review blocked requests and repeated violations.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Review blocked requests and repeated violations.')
+    ).toBeInTheDocument()
   })
 
   test('switching to the liveness tab loads probe guard data and switching back restores the triggers table', async () => {
@@ -108,7 +114,8 @@ describe('risk control center tabs', () => {
           dry_run_count: 2,
           trigger_count: 1,
           max_distinct: 8,
-          latest_models: '["gpt-4o","claude-3-5-sonnet","gemini-2.0-flash","deepseek-chat","kimi-k2"]',
+          latest_models:
+            '["gpt-4o","claude-3-5-sonnet","gemini-2.0-flash","deepseek-chat","kimi-k2"]',
           latest_distinct: 5,
           latest_ip: '203.0.113.10',
           latest_created_at: 1786993200,
@@ -124,12 +131,20 @@ describe('risk control center tabs', () => {
     expect(screen.getByText('gpt-4o')).toBeInTheDocument()
     expect(screen.getByText('+1')).toBeInTheDocument()
     expect(screen.getByText('203.0.113.10')).toBeInTheDocument()
-    expect(screen.getByText('Track accounts that repeatedly probe key validity.')).toBeInTheDocument()
-    expect(screen.queryByText('Review blocked requests and repeated violations.')).not.toBeInTheDocument()
+    expect(
+      screen.getByText('Track accounts that repeatedly probe key validity.')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('Review blocked requests and repeated violations.')
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Sensitive Word Triggers' }))
+    fireEvent.click(
+      screen.getByRole('tab', { name: 'Sensitive Word Triggers' })
+    )
 
-    expect(screen.getByText('Review blocked requests and repeated violations.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Review blocked requests and repeated violations.')
+    ).toBeInTheDocument()
     expect(screen.queryByText('probe_hunter')).not.toBeInTheDocument()
   })
 })

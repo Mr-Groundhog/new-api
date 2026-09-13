@@ -3,8 +3,8 @@ import { Check, Copy, ListOrdered, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { SectionPageLayout } from '@/components/layout'
 import { Dialog } from '@/components/dialog'
+import { SectionPageLayout } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 
 import {
@@ -60,13 +59,15 @@ export function UserRanking() {
             onClick={() => void query.refetch()}
             disabled={query.isFetching}
           >
-            <RefreshCw className={query.isFetching ? 'animate-spin' : undefined} />
+            <RefreshCw
+              className={query.isFetching ? 'animate-spin' : undefined}
+            />
           </Button>
         </SectionPageLayout.Actions>
         <SectionPageLayout.Content>
           <div className='flex h-full min-h-0 flex-col gap-3'>
             <div className='flex flex-wrap items-center justify-between gap-3'>
-              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+              <div className='text-muted-foreground flex items-center gap-2 text-sm'>
                 <ListOrdered className='size-4' aria-hidden='true' />
                 <span>{t('Ranked by the number of unique IP addresses.')}</span>
               </div>
@@ -94,7 +95,9 @@ export function UserRanking() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className='w-40'>{t('User')}</TableHead>
-                    <TableHead className='w-20 text-right'>{t('IP Count')}</TableHead>
+                    <TableHead className='w-20 text-right'>
+                      {t('IP Count')}
+                    </TableHead>
                     <TableHead className='w-[520px]'>{t('All IPs')}</TableHead>
                     <TableHead className='w-36 text-right'>
                       {t('IPs in Last 10 Minutes')}
@@ -119,7 +122,9 @@ export function UserRanking() {
                   )}
                   {!query.isLoading && items.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6}>{t('No user ranking data found.')}</TableCell>
+                      <TableCell colSpan={6}>
+                        {t('No user ranking data found.')}
+                      </TableCell>
                     </TableRow>
                   )}
                   {items.map((item) => (
@@ -128,7 +133,9 @@ export function UserRanking() {
                         {item.username || `#${item.user_id}`}
                       </TableCell>
                       <TableCell className='w-20 text-right'>
-                        <Badge variant='secondary'>{formatNumber(item.ip_count)}</Badge>
+                        <Badge variant='secondary'>
+                          {formatNumber(item.ip_count)}
+                        </Badge>
                       </TableCell>
                       <TableCell className='w-[520px]'>
                         {item.ips.length > 0 ? (
@@ -141,7 +148,9 @@ export function UserRanking() {
                             })}
                             onClick={() => setDetailTarget(item)}
                           >
-                            <span className='min-w-0 truncate'>{item.ips.join(', ')}</span>
+                            <span className='min-w-0 truncate'>
+                              {item.ips.join(', ')}
+                            </span>
                           </Button>
                         ) : (
                           <span className='text-muted-foreground'>-</span>
@@ -169,7 +178,7 @@ export function UserRanking() {
               </Table>
             </div>
 
-            <div className='text-sm text-muted-foreground'>
+            <div className='text-muted-foreground text-sm'>
               {t('Showing top {{count}} users', { count: 50 })}
             </div>
           </div>
@@ -192,7 +201,10 @@ export function UserRanking() {
         <div className='flex flex-col gap-4'>
           <div className='grid grid-cols-3 gap-3'>
             {[
-              { label: t('IP Count'), value: formatNumber(detailTarget?.ip_count ?? 0) },
+              {
+                label: t('IP Count'),
+                value: formatNumber(detailTarget?.ip_count ?? 0),
+              },
               {
                 label: t('IPs in Last 10 Minutes'),
                 value: formatNumber(detailTarget?.ten_minute_ip_count ?? 0),
@@ -206,9 +218,16 @@ export function UserRanking() {
                 value: formatNumber(detailTarget?.api_calls ?? 0),
               },
             ].map((stat) => (
-              <div key={stat.label} className='rounded-md border bg-muted/40 p-3'>
-                <div className='text-xs text-muted-foreground'>{stat.label}</div>
-                <div className='mt-1 text-lg font-semibold tabular-nums'>{stat.value}</div>
+              <div
+                key={stat.label}
+                className='bg-muted/40 rounded-md border p-3'
+              >
+                <div className='text-muted-foreground text-xs'>
+                  {stat.label}
+                </div>
+                <div className='mt-1 text-lg font-semibold tabular-nums'>
+                  {stat.value}
+                </div>
               </div>
             ))}
           </div>
@@ -217,7 +236,7 @@ export function UserRanking() {
               <span className='text-sm font-medium'>
                 {t('All IPs')}
                 {detailTarget && detailTarget.ips.length > 0 && (
-                  <span className='ml-1 text-xs font-normal text-muted-foreground'>
+                  <span className='text-muted-foreground ml-1 text-xs font-normal'>
                     ({formatNumber(detailTarget.ips.length)})
                   </span>
                 )}

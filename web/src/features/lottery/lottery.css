@@ -27,7 +27,9 @@ published by the Free Software Foundation, either version 3 of the License.
       transparent 27px,
       rgb(89 62 34 / 3%) 28px
     );
-  background-size: 5px 5px, auto;
+  background-size:
+    5px 5px,
+    auto;
 }
 
 .lottery-page-inner {
@@ -150,7 +152,9 @@ published by the Free Software Foundation, either version 3 of the License.
   overflow: hidden;
   border: 1px solid rgb(93 63 31 / 21%);
   background: rgb(251 247 237 / 92%);
-  transition: transform 140ms ease-out, box-shadow 140ms ease-out;
+  transition:
+    transform 140ms ease-out,
+    box-shadow 140ms ease-out;
 }
 
 .lottery-prize-cell::after {
@@ -210,7 +214,9 @@ published by the Free Software Foundation, either version 3 of the License.
   background: var(--lottery-red);
   box-shadow: inset 0 0 0 6px rgb(255 255 255 / 16%);
   cursor: pointer;
-  transition: transform 160ms ease-out, opacity 160ms ease-out;
+  transition:
+    transform 160ms ease-out,
+    opacity 160ms ease-out;
 }
 
 .lottery-board-center > svg {

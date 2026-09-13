@@ -144,6 +144,12 @@ export function SidebarModulesSection({
         title: t('Ticket Feedback'),
         description: t('User support tickets and admin replies.'),
       },
+      cooperation: {
+        title: t('Cooperation & Promotion'),
+        description: t(
+          'Users submit site cooperation applications for review.'
+        ),
+      },
     },
     admin: {
       channel: {
@@ -181,6 +187,10 @@ export function SidebarModulesSection({
       subscription: {
         title: t('Subscription Management'),
         description: t('Manage subscription plans and pricing.'),
+      },
+      cooperationReview: {
+        title: t('Cooperation & Promotion'),
+        description: t('Review site cooperation applications.'),
       },
     },
   }

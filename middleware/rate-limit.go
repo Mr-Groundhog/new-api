@@ -273,3 +273,10 @@ func SearchRateLimit() func(c *gin.Context) {
 func GithubStarClaimRateLimit() func(c *gin.Context) {
 	return userRateLimitFactory(5, 60, "UC:github-star-claim")
 }
+
+// CooperationApplyRateLimit 是合作推广申请接口的按用户限流，与按 IP 的
+// CriticalRateLimit 叠加使用：每用户 60 秒内最多 3 次提交。
+// 必须放在 UserAuth 之后使用。
+func CooperationApplyRateLimit() func(c *gin.Context) {
+	return userRateLimitFactory(3, 60, "UC:cooperation-apply")
+}

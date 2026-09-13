@@ -41,6 +41,8 @@ func SetApiRouter(router *gin.Engine) {
 			perfMetricsRoute.GET("", controller.GetPerfMetrics)
 		}
 		apiRouter.GET("/rankings", middleware.HeaderNavModuleAuth("rankings"), controller.GetRankings)
+		// 合作站点公共展示数据：partners 顶部导航模块开关控制（默认关闭）
+		apiRouter.GET("/cooperation/sites", middleware.HeaderNavModuleAuth("partners"), controller.GetCooperationSites)
 		lotteryRoute := apiRouter.Group("/lottery")
 		lotteryRoute.Use(middleware.HeaderNavModulePublicOrUserAuth("lottery"))
 		{
@@ -428,6 +430,26 @@ func SetApiRouter(router *gin.Engine) {
 			ticketAdminRoute.POST("/:id/reply", controller.ReplyTicket)
 			ticketAdminRoute.PUT("/:id/status", controller.UpdateTicketStatus)
 			ticketAdminRoute.DELETE("/:id", controller.DeleteTicket)
+		}
+		// 合作推广：用户提交站点合作申请，管理员分页查看 / 审核 / 删除
+		cooperationRoute := apiRouter.Group("/cooperation")
+		cooperationRoute.Use(middleware.UserAuth())
+		{
+			cooperationRoute.GET("/my-applications", controller.GetMyCooperationApplications)
+			cooperationRoute.POST("/apply", middleware.CriticalRateLimit(), middleware.CooperationApplyRateLimit(), controller.CreateCooperationApplication)
+		}
+		cooperationAdminRoute := apiRouter.Group("/cooperation/admin")
+		cooperationAdminRoute.Use(middleware.AdminAuth())
+		{
+			cooperationAdminRoute.GET("", controller.GetCooperationApplications)
+			cooperationAdminRoute.GET("/stats", controller.GetCooperationStats)
+			cooperationAdminRoute.PUT("/:id/review", controller.ReviewCooperationApplication)
+			cooperationAdminRoute.DELETE("/:id", controller.DeleteCooperationApplication)
+			// 合作站点展示条目管理（「合作站点」公共页面数据源）
+			cooperationAdminRoute.GET("/sites", controller.GetAllCooperationSites)
+			cooperationAdminRoute.POST("/sites", controller.AddCooperationSite)
+			cooperationAdminRoute.PUT("/sites", controller.UpdateCooperationSite)
+			cooperationAdminRoute.DELETE("/sites/:id", controller.DeleteCooperationSite)
 		}
 		logRoute := apiRouter.Group("/log")
 		logRoute.GET("/", middleware.AdminAuth(), controller.GetAllLogs)

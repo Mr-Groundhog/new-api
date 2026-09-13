@@ -664,13 +664,17 @@ export function useCommonLogsColumns(
       cell: ({ row }) => {
         const log = row.original
         const userAgent = log.user_agent
-        if (!userAgent) return <span className='text-muted-foreground/40'>—</span>
+        if (!userAgent)
+          return <span className='text-muted-foreground/40'>—</span>
 
         return (
           <TooltipProvider delay={300}>
             <Tooltip>
               <TooltipTrigger render={<div className='max-w-full' />}>
-                <span className='block max-w-[240px] truncate font-mono text-xs' title={userAgent}>
+                <span
+                  className='block max-w-[240px] truncate font-mono text-xs'
+                  title={userAgent}
+                >
                   {userAgent}
                 </span>
               </TooltipTrigger>
@@ -828,7 +832,7 @@ export function useCommonLogsColumns(
       },
       size: 180,
       maxSize: 200,
-    },
+    }
   )
 
   return columns

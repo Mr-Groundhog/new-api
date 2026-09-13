@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { StatusBadgeProps } from '@/components/status-badge'
-import { formatLogQuota } from '@/lib/format'
 import {
   BILLING_PRICING_VARS,
   normalizeTierLabel,
@@ -25,6 +24,7 @@ import {
   splitBillingExprAndRequestRules,
   type ParsedTier,
 } from '@/features/pricing/lib/billing-expr'
+import { formatLogQuota } from '@/lib/format'
 
 import type { UsageLog } from '../data/schema'
 import type { LogOtherData } from '../types'

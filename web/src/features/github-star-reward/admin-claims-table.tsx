@@ -21,8 +21,8 @@ import { toast } from 'sonner'
 import { DataTablePage, useDataTable } from '@/components/data-table'
 import { useMediaQuery } from '@/hooks'
 
-import { getGithubStarRewardClaims } from './api'
 import { useGithubStarClaimsColumns } from './admin-claims-columns'
+import { getGithubStarRewardClaims } from './api'
 import { getGithubStarStatusOptions } from './constants'
 
 // GithubStarClaimsTable 是工单管理页「Star 领取审批」Tab 的内容：分页、
@@ -41,14 +41,14 @@ export function GithubStarClaimsTable() {
 
   const onGlobalFilterChange: OnChangeFn<string> = (updater) => {
     setGlobalFilter((prev) =>
-      typeof updater === 'function' ? updater(prev) : updater,
+      typeof updater === 'function' ? updater(prev) : updater
     )
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updater) => {
     setColumnFilters((prev) =>
-      typeof updater === 'function' ? updater(prev) : updater,
+      typeof updater === 'function' ? updater(prev) : updater
     )
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
@@ -87,7 +87,7 @@ export function GithubStarClaimsTable() {
         toast.error(
           error instanceof Error
             ? error.message
-            : t('Failed to load GitHub Star claims'),
+            : t('Failed to load GitHub Star claims')
         )
         return { items: [], total: 0 }
       }
@@ -112,10 +112,7 @@ export function GithubStarClaimsTable() {
     ensurePageInRange,
   })
 
-  const statusOptions = useMemo(
-    () => getGithubStarStatusOptions(t),
-    [t],
-  )
+  const statusOptions = useMemo(() => getGithubStarStatusOptions(t), [t])
 
   return (
     <DataTablePage
@@ -125,7 +122,7 @@ export function GithubStarClaimsTable() {
       isFetching={isFetching}
       emptyTitle={t('No claims found')}
       emptyDescription={t(
-        'No GitHub Star reward claims yet. Users can claim the reward from the personal area once they star the repository.',
+        'No GitHub Star reward claims yet. Users can claim the reward from the personal area once they star the repository.'
       )}
       skeletonKeyPrefix='github-star-claims-skeleton'
       toolbarProps={{

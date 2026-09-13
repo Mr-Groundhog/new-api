@@ -23,14 +23,13 @@ import { useTranslation } from 'react-i18next'
 
 import { StatusBadge } from '@/components/status-badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import { getTokenRiskBadges } from '@/features/sensitive-word-violations/api-token-risk'
 import { useMediaQuery } from '@/hooks'
 import { toIntlLocale } from '@/i18n/languages'
 import { getUserGroups } from '@/lib/api'
 import { getCurrencyDisplay } from '@/lib/currency'
 import { requireServerSuccess } from '@/lib/server-error-message'
 import { useSystemConfigStore } from '@/stores/system-config-store'
-
-import { getTokenRiskBadges } from '@/features/sensitive-word-violations/api-token-risk'
 
 import { API_KEY_STATUSES } from '../constants'
 import type { ApiKey } from '../types'
@@ -86,7 +85,10 @@ export function useApiKeysColumns(now: number): ColumnDef<ApiKey>[] {
   const groupRatios = useMemo(() => {
     const ratios: Record<string, number | string> = {}
     for (const option of groupOptions) {
-      if (typeof option.ratio === 'number' || typeof option.ratio === 'string') {
+      if (
+        typeof option.ratio === 'number' ||
+        typeof option.ratio === 'string'
+      ) {
         ratios[option.value] = option.ratio
       }
     }

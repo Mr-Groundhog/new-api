@@ -74,9 +74,9 @@ describe('request content dialog match navigation', () => {
     render(<RequestContentDialog violation={violation} onClose={() => {}} />)
 
     expect(screen.getByText('2 matches found')).toBeVisible()
-    expect(
-      screen.getByText('Matched Words').parentElement
-    ).toHaveTextContent('secret')
+    expect(screen.getByText('Matched Words').parentElement).toHaveTextContent(
+      'secret'
+    )
   })
 
   test('jumping scrolls the first match into view and marks it as current', () => {

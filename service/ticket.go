@@ -80,7 +80,7 @@ func ValidateTicketInput(ticketType int, title string, content string) (int, str
 		ticketType = model.TicketTypeAPICall
 	}
 	switch ticketType {
-	case model.TicketTypeAPICall, model.TicketTypeAccount, model.TicketTypeBilling, model.TicketTypeOther:
+	case model.TicketTypeAPICall, model.TicketTypeAccount, model.TicketTypeBilling, model.TicketTypeOther, model.TicketTypeCooperation:
 	default:
 		return 0, "", "", ErrTicketTypeInvalid
 	}

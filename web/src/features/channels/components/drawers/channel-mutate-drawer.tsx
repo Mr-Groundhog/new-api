@@ -3711,7 +3711,6 @@ export function ChannelMutateDrawer({
                               )}
                             />
                           </div>
-
                         </div>
                       </ChannelModelsSection>
                     </div>
@@ -4128,7 +4127,9 @@ export function ChannelMutateDrawer({
                                             size='sm'
                                             className='h-7'
                                           >
-                                            <SelectValue placeholder={t('CLI Template')} />
+                                            <SelectValue
+                                              placeholder={t('CLI Template')}
+                                            />
                                           </SelectTrigger>
                                           <SelectContent align='start'>
                                             <SelectItem value='passthrough'>
