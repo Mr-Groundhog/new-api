@@ -59,7 +59,7 @@ beforeEach(() => {
   client = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   })
-  client.setQueryData(['model-status', 168, ''], {
+  client.setQueryData(['model-status', 24, ''], {
     success: true,
     data: {
       summary: {
@@ -69,7 +69,7 @@ beforeEach(() => {
         model_count: models.length,
       },
       window_start: 1789387200,
-      window_end: 1789387200 + 168 * 3600,
+      window_end: 1789387200 + 24 * 3600,
       models,
     },
   })

@@ -56,7 +56,7 @@ export function ModelStatus() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [hours, setHours] = useState<number>(168)
+  const [hours, setHours] = useState<number>(24)
   const [group, setGroup] = useState<string>('')
   const [keyword, setKeyword] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('success_rate')
