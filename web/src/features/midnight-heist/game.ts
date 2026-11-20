@@ -9,7 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 export const GAME_WIDTH = 900
 export const GAME_HEIGHT = 540
-export const GAME_DURATION = 40
+export const GAME_DURATION = 50
 export const MAX_SCORE = 9999
 const STEP_MS = 20
 

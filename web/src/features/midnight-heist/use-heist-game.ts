@@ -24,6 +24,7 @@ import {
 } from './api'
 import {
   CoinCaptureGame,
+  GAME_DURATION,
   GAME_HEIGHT,
   GAME_WIDTH,
   type GameSnapshot,
@@ -60,7 +61,7 @@ export function useHeistGame() {
   const [snapshot, setSnapshot] = useState<GameSnapshot>({
     mode: 'ready',
     score: 0,
-    seconds: 40,
+    seconds: GAME_DURATION,
     multiplier: 1,
     status: 'safe',
     coinsCollected: 0,

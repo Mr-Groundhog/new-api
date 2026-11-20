@@ -40,8 +40,8 @@ type CoinCaptureRound struct {
 	Score       int    `json:"score" gorm:"not null;index:idx_coin_capture_ranking,priority:2"`                                            // Server-calculated final score in [0, 9999].
 	RewardCents int    `json:"reward_cents" gorm:"not null"`                                                                               // floor(Score/10), so 5130 and 5136 both convert to 513 cents of base quota value.
 	Quota       int    `json:"quota" gorm:"type:bigint;not null"`                                                                          // Actual internal quota credited, converted with the top-up quota helper.
-	TopUpId     int    `json:"top_up_id" gorm:"not null"`                                                                                  // Legacy payment-order reference; new rewards use top-up type usage logs and leave this zero.
-	StartedAt   int64  `json:"started_at" gorm:"bigint;not null;index:idx_coin_capture_pending,priority:2"`                                // Server Unix milliseconds when the 40-second timer starts.
+	TopUpId     int    `json:"top_up_id" gorm:"not null"`                                                                                  // Legacy payment-order reference; new rewards use system type usage logs and leave this zero.
+	StartedAt   int64  `json:"started_at" gorm:"bigint;not null;index:idx_coin_capture_pending,priority:2"`                                // Server Unix milliseconds when the 50-second timer starts.
 	SettledAt   int64  `json:"settled_at" gorm:"bigint;not null"`                                                                          // Server Unix milliseconds when score and quota are committed; zero until settled.
 	Sequence    int64  `json:"sequence" gorm:"bigint;not null"`                                                                            // Number of replayed target changes after settlement; legacy rounds used a movement sequence.
 	Revision    int64  `json:"-" gorm:"bigint;not null"`                                                                                   // Compare-and-swap revision that also protects SQLite, which has no SELECT FOR UPDATE.
@@ -191,27 +191,27 @@ func SettleCoinCaptureRound(userId int, roundId string, movements []coincapture.
 	}
 	if credited > 0 {
 		syncCreditUserQuotaCache(userId, credited, "coin capture")
-		RecordLog(userId, LogTypeTopup, common.NewMessage("Coin Capture Operation: score {{score}}, quota added {{quota}}", map[string]any{
+		RecordLog(userId, LogTypeSystem, common.NewMessage("Coin Capture Operation: score {{score}}, quota added {{quota}}", map[string]any{
 			"score": view.Round.Score, "quota": logger.FormatQuota(credited),
 		}))
 	}
 	return &view, nil
 }
 
-// GetCoinCaptureLeaderboard returns each player's best settled result, with
-// stable ties and a server-enforced maximum of 50 distinct players.
+// CoinCaptureRanking is a player's settled result on the daily leaderboard.
 type CoinCaptureRanking struct {
 	RoundId     string `json:"round_id"`
 	DisplayName string `json:"display_name"`
 	Score       int    `json:"score"`
 }
 
-func GetCoinCaptureLeaderboard() ([]CoinCaptureRanking, error) {
+// GetCoinCaptureLeaderboard returns today's settled results in Asia/Shanghai,
+// with stable ties and a server-enforced maximum of 50 distinct players.
+func GetCoinCaptureLeaderboard(now time.Time) ([]CoinCaptureRanking, error) {
 	var rounds []CoinCaptureRound
 	query := DB.Model(&CoinCaptureRound{}).
 		Select("round_id", "display_name", "score").
-		Where("status = ?", CoinCaptureSettled).
-		Where(`NOT EXISTS (SELECT 1 FROM coin_capture_rounds AS better WHERE better.user_id = coin_capture_rounds.user_id AND better.status = ? AND (better.score > coin_capture_rounds.score OR (better.score = coin_capture_rounds.score AND better.id < coin_capture_rounds.id)))`, CoinCaptureSettled).
+		Where("status = ? AND game_day = ?", CoinCaptureSettled, now.In(shanghaiLocation).Format("2006-01-02")).
 		Order("score DESC, settled_at ASC, id ASC").Limit(50)
 	if err := query.Find(&rounds).Error; err != nil {
 		return nil, err

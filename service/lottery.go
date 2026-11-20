@@ -129,9 +129,9 @@ func DrawLottery(userId int, username string, now time.Time) (*LotteryDrawResult
 		return nil, err
 	}
 
-	// 中奖额度以充值类型写入使用日志，用户可在「使用日志」页按充值类型查到入账。
+	// 中奖额度以系统类型写入使用日志，用户可在「使用日志」页按系统类型查到入账。
 	if selected.QuotaAmount > 0 {
-		model.RecordLog(userId, model.LogTypeTopup, common.NewMessage(
+		model.RecordLog(userId, model.LogTypeSystem, common.NewMessage(
 			"通过幸运九宫格抽奖获得额度: {{quota}}", map[string]any{"quota": logger.FormatQuota(selected.QuotaAmount)}))
 	}
 

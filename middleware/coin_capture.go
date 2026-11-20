@@ -45,7 +45,7 @@ func CoinCaptureBrowserWrite() gin.HandlerFunc {
 			abortWithWebMessage(c, http.StatusBadRequest, "COIN_CAPTURE_INVALID_REQUEST", common.NewMessage("Invalid game request"))
 			return
 		}
-		// At most 2000 fixed-tick target changes for a 40-second round.
+		// At most 2500 fixed-tick target changes for a 50-second round.
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 256*1024)
 		c.Next()
 	}

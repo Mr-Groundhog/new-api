@@ -10,7 +10,7 @@ import (
 const (
 	Width      = 900
 	Height     = 540
-	DurationMS = 40_000
+	DurationMS = 50_000
 	MaxScore   = 9999
 	StepMS     = 20
 )

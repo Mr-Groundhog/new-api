@@ -42,7 +42,9 @@ export const PlayerLeaderboard = memo(function PlayerLeaderboard() {
         <h3 className='text-xs font-semibold sm:text-sm'>
           {t('Player rankings')}
         </h3>
-        <span className='text-muted-foreground text-[10px]'>{t('Top 50')}</span>
+        <span className='text-muted-foreground text-[10px]'>
+          {t('Today’s top 50')}
+        </span>
       </header>
       <div className='min-h-0 flex-1 [scrollbar-gutter:stable] overflow-y-auto overscroll-contain'>
         {query.isPending && <LoadingState size='sm' className='min-h-0 py-4' />}

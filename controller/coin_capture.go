@@ -22,7 +22,7 @@ func GetCoinCaptureStatus(c *gin.Context) {
 }
 
 func GetCoinCaptureLeaderboard(c *gin.Context) {
-	rounds, err := model.GetCoinCaptureLeaderboard()
+	rounds, err := model.GetCoinCaptureLeaderboard(time.Now())
 	if err != nil {
 		common.SysError(common.LogText("coin capture leaderboard failed: %s", err.Error()))
 		common.ApiErrorStatus(c, http.StatusServiceUnavailable, common.NewMessage("Failed to load player rankings"))

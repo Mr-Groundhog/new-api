@@ -26,7 +26,7 @@ import { formatNumber } from '@/lib/format'
 import { handleServerError } from '@/lib/handle-server-error'
 import { getServerErrorMessage } from '@/lib/server-error-message'
 
-import { GAME_HEIGHT, GAME_WIDTH, MAX_SCORE } from './game'
+import { GAME_DURATION, GAME_HEIGHT, GAME_WIDTH, MAX_SCORE } from './game'
 import { fitCoinCaptureBoard } from './layout'
 import { PlayerLeaderboard } from './leaderboard'
 import { useHeistGame } from './use-heist-game'
@@ -326,7 +326,8 @@ export function CoinCaptureOperation() {
               </div>
               <footer className='flex shrink-0 flex-col gap-0.5 overflow-hidden text-[10px] leading-tight text-[#aebdb2]'>
                 <span className='truncate'>
-                  {t('40 seconds · Once daily · Max {{score}} points', {
+                  {t('{{seconds}} seconds · Once daily · Max {{score}} points', {
+                    seconds: GAME_DURATION,
                     score: MAX_SCORE,
                   })}
                 </span>
